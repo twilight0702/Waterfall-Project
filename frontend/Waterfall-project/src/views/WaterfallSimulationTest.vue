@@ -62,7 +62,7 @@ export default {
     // 请求数据
     fetchData() {
       axios
-        .get('/knowledge/random-tests?limit=5') // 使用代理路径
+        .get('/knowledge/random-tests?limit=10') // 使用代理路径
         .then((response) => {
           this.data = response.data; // 假设接口返回 JSON 数据
         })
