@@ -112,11 +112,16 @@ fetchChapterContent(chapterName) {
   color: #333;
   font-size: 24px;
   margin-bottom: 10px;
+  min-height: 80px; /* 设置最小高度为50像素 */
+  display: flex; /* 启用 flex 布局 */
+  align-items: center; /* 垂直居中 */
+  text-align: center; /* 如果有多行文字，居中对齐 */
 }
 
 .chapter-content p {
   color: #000000;
   font-size: 16px;
+  line-height: 2.0;
 }
 
 .error-message {
