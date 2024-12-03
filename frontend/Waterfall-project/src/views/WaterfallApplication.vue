@@ -8,11 +8,11 @@
       <!-- 显示加载状态 -->
       <div v-if="loading" class="loading">加载中...</div>
 
-      <!-- 显示章节内容 -->
-      <div v-if="chapterContent && chapterContent.name" class="chapter-content">
-        <h2>{{ chapterContent.name }}</h2>
-        <p>{{ chapterContent.text }}</p>
-      </div>
+    <!-- 显示章节内容 -->
+    <div v-if="chapterContent && chapterContent.name" class="chapter-content">
+      <h2>{{ chapterContent.name }}</h2>
+      <p class="formatted-text">{{ chapterContent.text }}</p>
+    </div>
 
       <!-- 显示错误信息 -->
       <div v-if="errorMessage" class="error-message">
@@ -21,6 +21,12 @@
     </div>
   </div>
 </template>
+
+<style>
+.formatted-text {
+  white-space: pre-wrap;
+}
+</style>
 
 <script>
 import axios from 'axios';
