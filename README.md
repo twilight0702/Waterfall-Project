@@ -84,7 +84,7 @@
 
 ```bash
 npm install
-npx vite
+npm run dev
 ```
 
 下载相关依赖后运行（可以使用ctrl+c退出运行）
