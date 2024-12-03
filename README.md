@@ -80,7 +80,7 @@
 
 3. 打开使用java的IDE打开本地的``/api``，配置好maven。运行``api\demo\src\main\java\com\example\Test\TestApplication.java``，启动后端服务。  
 
-4. 使用vscode打开``/Frontend``文件夹，在终端中输入
+4. 使用vscode打开``/Frontend/Waterfall-project``文件夹，在终端中输入
 
 ```bash
 npm install
