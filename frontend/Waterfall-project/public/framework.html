@@ -49,42 +49,53 @@
 
       const width = window.innerWidth;
       const height = 600;
+
+      // 定义 SVG 主容器
       const svg = d3.select("#graph")
         .attr("width", width)
         .attr("height", height);
 
+      // 添加一个组（g）用于偏移整个图谱
+      const graphGroup = svg.append("g")
+        .attr("transform", "translate(0, 30)"); // 设置整体下移 100 像素
+
+      // 数据预处理：将 source 和 target 转为引用节点
       data.links.forEach(link => {
         link.source = link.from;
         link.target = link.to;
       });
 
+      // 力布局模拟器
       const simulation = d3.forceSimulation(data.nodes)
         .force("link", d3.forceLink(data.links).id(d => d.id).distance(100))
         .force("charge", d3.forceManyBody().strength(-300))
         .force("center", d3.forceCenter(width / 2, height / 2))
         .force("collision", d3.forceCollide().radius(40));
 
-      const linkPath = svg.append("g")
+      // 绘制链接路径
+      const linkPath = graphGroup.append("g")
         .selectAll("path")
         .data(data.links)
         .enter().append("path")
         .attr("class", "link");
 
-      const linkText = svg.append("g")
+      // 绘制链接上的标签
+      const linkText = graphGroup.append("g")
         .selectAll(".link-text")
         .data(data.links)
         .enter().append("text")
         .attr("class", "label")
-        .attr("dy", -5)  // 调整垂直位置
+        .attr("dy", -5) // 调整垂直位置
         .append("textPath")
-        .attr("xlink:href", (d, i) => `#link${i}`)  // 引用路径ID
-        .attr("startOffset", "50%")  // 文字在路径的中间
+        .attr("xlink:href", (d, i) => `#link${i}`) // 引用路径ID
+        .attr("startOffset", "50%") // 文字在路径的中间
         .text(d => d.label);
 
       linkPath
-        .attr("id", (d, i) => `link${i}`);  // 给每个路径分配ID
+        .attr("id", (d, i) => `link${i}`); // 给每个路径分配ID
 
-      const node = svg.append("g")
+      // 绘制节点
+      const node = graphGroup.append("g")
         .selectAll(".node")
         .data(data.nodes)
         .enter().append("circle")
@@ -95,7 +106,8 @@
           .on("drag", dragged)
           .on("end", dragended));
 
-      const label = svg.append("g")
+      // 绘制节点标签
+      const label = graphGroup.append("g")
         .selectAll(".label")
         .data(data.nodes)
         .enter().append("text")
@@ -105,6 +117,7 @@
         .attr("y", ".31em")
         .text(d => d.title);
 
+      // 力布局更新位置
       simulation.on("tick", function () {
         linkPath
           .attr("d", d => {
@@ -127,6 +140,7 @@
           .attr("y", d => (d.source.y + d.target.y) / 2);
       });
 
+      // 拖拽事件
       function dragstarted(event, d) {
         if (!event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
