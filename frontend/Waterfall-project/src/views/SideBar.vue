@@ -37,7 +37,6 @@
           <li @click="goToContent('变体-V模型')" class="sub-chapter">变体-V模型</li>
           <li @click="goToContent('螺旋模型')" class="sub-chapter">螺旋模型</li>
           <li @click="goToContent('敏捷开发')" class="sub-chapter">敏捷开发</li>
-          <li @click="goToContent('相关理论习题')" class="sub-chapter">相关理论习题</li>
         </ul>
       </li>
     </ul>
