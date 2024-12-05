@@ -100,7 +100,7 @@ fetchChapterContent(chapterName) {
   width: 80%;
   box-sizing: border-box;
   overflow-y: auto;
-  margin-left: 150px;
+  margin-left: 220px;
 }
 
 .loading {
