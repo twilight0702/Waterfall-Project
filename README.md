@@ -113,8 +113,14 @@ http://localhost:8080/knowledge/by_name/敏捷开发
 
 最后一部分可替换成具体的名字
 
-4.请求题目
+4.请求题目（仅限定返回的题目数量，题目随机抽取）
 
 http://localhost:8080/knowledge/random-tests?limit=5
 
 最后那个数字是请求的题目数量，可修改
+
+5.请求题目（限定返回题目数和所属知识点）
+
+http://localhost:8080/knowledge/random-tests-has-limits?limit=5&labels=部署与发布,系统设计
+
+limit后面那个是返回题目的数量，labels后面是知识点的名字，用逗号隔开，**注意是英文逗号！！！**
