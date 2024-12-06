@@ -1,9 +1,6 @@
 <template>
     <div>
-      <h1>
-        登录
-      </h1>
-  
+      <h1>登录</h1>
       <div>
         <input v-model="name" placeholder="用户名" />
         <br />
@@ -16,92 +13,65 @@
   </template>
   
   <script>
-  import bcrypt from 'bcryptjs'; // 加密库
-
+  import axios from 'axios';
+  
   export default {
     data() {
       return {
         name: '',
         Password: '',
-        users: this.getUsersFromStorage(), // 从 LocalStorage 加载用户数据
       };
     },
     methods: {
-      // 注册逻辑
-      async register() {
-        const { name, Password, users } = this;
-
+      // 登录逻辑
+      async login() {
+        const { name, Password } = this;
+  
         if (!name || !Password) {
           alert('用户名和密码不能为空');
           return;
         }
-
-        if (users.find(user => user.username === name)) {
-          alert('用户名已存在');
+  
+        try {
+            console.log('用户名:', name);
+            console.log('密码:', Password);
+          const response = await axios.post('http://localhost:3000/login', {
+            username: name,
+            password: Password,
+          });
+  
+          alert('登录成功！');
+          this.$router.push('/waterfall-basic-knowledge');
+        } catch (err) {
+          alert(err.response?.data || '登录失败');
+        }
+      },
+  
+      // 注册逻辑
+      async register() {
+        const { name, Password } = this;
+  
+        if (!name || !Password) {
+          alert('用户名和密码不能为空');
           return;
         }
-
+  
         try {
-          // 加密密码
-          const hashedPassword = await bcrypt.hash(Password, 10);
-
-          // 添加新用户
-          const newUser = { username: name, password: hashedPassword, data: {} };
-          users.push(newUser);
-          this.saveUsersToStorage(users);
-
+          const response = await axios.post('http://localhost:3000/register', {
+            username: name,
+            password: Password,
+          });
+  
           alert('注册成功');
           this.$router.push('/waterfall-basic-knowledge');
         } catch (err) {
-          console.error('注册失败:', err);
-          alert('注册失败，请稍后再试');
+          alert(err.response?.data || '注册失败');
         }
-      },
-
-      // 登录逻辑
-      async login() {
-        const { name, Password, users } = this;
-
-        if (!name || !Password) {
-          alert('用户名和密码不能为空');
-          return;
-        }
-
-        const user = users.find(user => user.username === name);
-
-        if (!user) {
-          alert('用户名或密码错误');
-          return;
-        }
-
-        try {
-          // 验证密码
-          const passwordMatch = await bcrypt.compare(Password, user.password);
-          if (passwordMatch) {
-            //alert(`登录成功！欢迎 ${loginUsername}`);
-            this.$router.push('/waterfall-basic-knowledge');
-          } else {
-            alert('用户名或密码错误');
-          }
-        } catch (err) {
-          console.error('登录失败:', err);
-          alert('登录失败，请稍后再试');
-        }
-      },
-
-      // 从 LocalStorage 读取用户数据
-      getUsersFromStorage() {
-        const usersJson = localStorage.getItem('users');
-        return usersJson ? JSON.parse(usersJson) : [];
-      },
-
-      // 将用户数据保存到 LocalStorage
-      saveUsersToStorage(users) {
-        localStorage.setItem('users', JSON.stringify(users));
       },
     },
   };
-</script>
+  </script>
+  
 
 <style>
 /* 简单样式 */
