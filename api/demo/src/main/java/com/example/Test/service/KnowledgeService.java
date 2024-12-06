@@ -7,10 +7,7 @@ import org.neo4j.driver.SessionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class KnowledgeService {
@@ -105,6 +102,30 @@ RETURN subjectNodes, collect(DISTINCT {id: id(allKnowledge), labels: labels(allK
                     """;
             Map<String, Object> params = new HashMap<>();
             params.put("limit", limit);
+
+            Result result = session.run(query, params);
+
+            if (result.hasNext()) {
+                return result.next().get("nodes").asList(value -> value.asMap());
+            } else {
+                return new ArrayList<>(); // 如果没有数据返回空列表
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to query Neo4j: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Map<String, Object>> getRandomTestsHasLimits(String databaseName, int limit,List<String> labels) {
+        try (Session session = neo4jDriver.session(SessionConfig.forDatabase(databaseName))) {
+            String query = """
+                    MATCH (n:test)
+                    WHERE n.kn IN $labels
+                    WITH n ORDER BY rand() LIMIT $limit
+                    RETURN collect({properties: properties(n)}) AS nodes
+                    """;
+            Map<String, Object> params = new HashMap<>();
+            params.put("limit", limit);
+            params.put("labels", labels);
 
             Result result = session.run(query, params);
 
