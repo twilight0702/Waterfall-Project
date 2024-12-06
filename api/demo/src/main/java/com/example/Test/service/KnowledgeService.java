@@ -127,6 +127,7 @@ RETURN subjectNodes, collect(DISTINCT {id: id(allKnowledge), labels: labels(allK
             params.put("limit", limit);
             params.put("labels", labels);
 
+            System.out.println("数据库访问语句"+query);
             Result result = session.run(query, params);
 
             if (result.hasNext()) {

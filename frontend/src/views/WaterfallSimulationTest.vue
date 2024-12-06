@@ -111,25 +111,40 @@ export default {
         { name: '实施最佳实践' },
         { name: '改进方向' },
         { name: '总结与反思' },
+        { name: '部署与发布' },
       ], // 初始知识点选项
     };
   },
   methods: {
     // 获取数据，根据题目数量和知识点范围
     fetchData() {
-      axios
-        .get('/knowledge/random-tests', {
-          params: {
-            limit: this.questionCount, // 根据题目数量
-            range: this.selectedKnowledgePoints.join(','), // 根据多个选择的知识点
-          },
-        })
-        .then((response) => {
-          this.data = response.data; // 假设接口返回 JSON 数据
-        })
-        .catch((error) => {
-          console.error('获取数据失败:', error);
-        });
+  console.log("获取题目数量：" + this.questionCount + " 知识点范围：" + this.selectedKnowledgePoints.map(item => item.name));
+
+  axios
+    .get('/knowledge/random-tests-has-limits', {
+      params: {
+        limit: this.questionCount,
+        labels: this.selectedKnowledgePoints.map(item => item.name), 
+      },
+      paramsSerializer: (params) => {
+        const query = Object.keys(params)
+          .map((key) => {
+            if (Array.isArray(params[key])) {
+              return params[key].map((val) => `${key}=${encodeURIComponent(val)}`).join('&');
+            }
+            return `${key}=${encodeURIComponent(params[key])}`;
+          })
+          .join('&');
+        console.log("题目访问请求:", query); 
+        return query;
+      },
+    })
+    .then((response) => {
+      this.data = response.data; // 假设接口返回 JSON 数据
+    })
+    .catch((error) => {
+      console.error('获取数据失败:', error);
+    });
     },
 
     // 用户点击确认后开始测验

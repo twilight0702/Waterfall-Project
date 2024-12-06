@@ -80,6 +80,14 @@ public class KnowledgeController {
             @RequestParam int limit,
             @RequestParam List<String> labels) {
 
+        //调试用输出
+        System.out.print("前端访问的题目知识点：");
+        for(String s:labels)
+        {
+            System.out.print(s+"  ");
+        }
+        System.out.println(" ");
+
         List<Map<String, Object>> result = knowledgeService.getRandomTestsHasLimits("database3", limit , labels);
         if (result.isEmpty()) {
             return ResponseEntity.status(404).body(Collections.emptyList());
