@@ -1,7 +1,7 @@
-<!-- App.vue -->
 <template>
   <div id="app">
-    <NavBar />
+    <!-- 根据路由 meta.hideNavBar 属性动态显示或隐藏 NavBar -->
+    <NavBar v-if="!$route.meta.hideNavBar" />
     <router-view />
   </div>
 </template>
@@ -12,8 +12,8 @@ import NavBar from './components/NavBar.vue';
 export default {
   name: 'App',
   components: {
-    NavBar
-  }
+    NavBar,
+  },
 };
 </script>
 
