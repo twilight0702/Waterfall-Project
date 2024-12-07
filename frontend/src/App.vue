@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- 根据路由 meta.hideNavBar 属性动态显示或隐藏 NavBar -->
-    <NavBar v-if="!$route.meta.hideNavBar" />
+    <NavBar />
     <router-view />
   </div>
 </template>

@@ -8,7 +8,7 @@
   <style>
     svg {
       width: 1700px;
-      height: 700px;
+      height: 1200px;
     }
     .node {
       fill: #69b3a2;
@@ -53,7 +53,7 @@
       });
 
       const width = window.innerWidth;
-      const height = 600;
+      const height = 900;
 
       // 定义 SVG 主容器
       const svg = d3.select("#graph")
@@ -120,7 +120,7 @@
         .attr("text-anchor", "middle")
         .attr("x", 12)
         .attr("y", ".31em")
-        .text(d => d.title);
+        .text(d => ((d.title.length > 5) ? d.title.substr(0,4) + "..." : d.title));
 
       // 力布局更新位置
       simulation.on("tick", function () {

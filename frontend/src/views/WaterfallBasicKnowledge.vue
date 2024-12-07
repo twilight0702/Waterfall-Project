@@ -17,14 +17,13 @@
 
     <!-- 主要内容区域 -->
     <div class="content">
-      <!-- 显示加载状态 -->
-      <div v-if="loading" class="loading">加载中...</div>
 
       <!-- 显示章节内容 -->
       <div v-if="chapterContent && chapterContent.name" class="chapter-content">
         <h2>{{ chapterContent.name }}</h2>
-        <p class="formatted-text">{{ chapterContent.text }}</p>
+        <p class="formatted-text" id="my-text">{{ chapterContent.text }}</p>
       </div>
+
 
       <!-- 显示对应图片 -->
       <div v-if="chapterContent && chapterContent.image_url" class="chapter-image">
@@ -40,13 +39,49 @@
 </template>
 
 <style scoped>
+
+
+.content {
+  position: fixed;
+  top: 100px;
+  left: max(20%, 270px);
+  right: 2%;
+  display: flex;
+}
+
+.chapter-content {
+  width: 100%; /* 根据容器自动适配宽度 */
+  max-height: 80vh; /* 限制最大高度，防止溢出 */
+  margin: 0 auto; /* 居中容器 */
+  padding: 20px;
+  overflow-y: auto; /* 启用垂直滚动 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加阴影以区分内容块 */
+  background-color: #fff; /* 白色背景 */
+  border-radius: 8px; /* 添加圆角 */
+  border: 1px solid #ddd; /* 边框 */
+}
+
+.chapter-content h2 {
+  font-size: 32px; /* 设置标题字号 */
+  text-align: center; /* 标题居中 */
+  margin-bottom: 20px; /* 增加下方间距 */
+  color: #333; /* 标题文字颜色 */
+}
+
+.chapter-content .formatted-text {
+  font-size: 20px; /* 设置文本字号 */
+  line-height: 1.6; /* 行高增强可读性 */
+  color: #555; /* 文本颜色 */
+  white-space: pre-wrap; /* 保留换行和空格格式 */
+}
+
 /* 搜索框样式 */
 .search-box {
   position: fixed;
   top: 50px;
-  left: 81%;
+  right: 2%;
   z-index: 100;
-  width: 80%;
+  width: 100%;
   max-width: 300px;
   display: flex;
 }
@@ -93,9 +128,8 @@ export default {
   components: { SideBar },
   data() {
     return {
-      selectedChapter: '概念',  // 默认选择“瀑布模型的概念”
+      selectedChapter: '瀑布模型的起源',  // 默认选择“瀑布模型的概念”
       chapterContent: null,  // 存储章节内容
-      loading: false,       // 控制加载状态
       errorMessage: '',     // 存储错误信息
       searchQuery: '',      // 搜索框内容绑定
     };
@@ -112,7 +146,6 @@ export default {
 
     // 请求章节内容
     fetchChapterContent(chapterName) {
-      this.loading = true;
       this.errorMessage = '';  // 清空错误信息
       console.log('请求章节内容：', chapterName); // 打印请求的章节名称
 
@@ -121,6 +154,15 @@ export default {
         .then(response => {
           if (response.data && response.data.name && response.data.name === chapterName) {
             this.chapterContent = response.data;  // 更新章节内容
+            const formattedText = this.chapterContent.text
+              .split('\n')
+              .map(line => {
+                if(line.length < 15)
+                  return `${line}`
+                else return `\t${line}`
+              })
+              .join('\n\n');
+            this.chapterContent.text = formattedText;
           } else {
             this.errorMessage = '无法获取当前章节内容。';
           }
@@ -129,7 +171,7 @@ export default {
           this.errorMessage = '请求失败，请稍后再试。';
         })
         .finally(() => {
-          this.loading = false;  // 结束加载
+          console.log("over");
         });
     },
 
@@ -144,7 +186,7 @@ export default {
     }
   },
   created() {
-    // 不再需要默认章节，直接等待用户点击搜索
+    this.fetchChapterContent(this.selectedChapter);
   }
 };
 </script>

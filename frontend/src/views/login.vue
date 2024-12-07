@@ -16,6 +16,7 @@
 
 <script>
 import axios from 'axios';
+import eventBus from '@/eventBus'
 
 export default {
   data() {
@@ -65,10 +66,10 @@ async login() {
         alertBox.style.opacity = '1';
       }, 0);
 
+      eventBus.emit('usernameUpdated', name);
       // 登录成功后将用户名传递到目标路由页面
       this.$router.push({ 
         path: '/waterfall-basic-knowledge',
-        state: { username: name } // 将用户名存储在路由的 state 中
       });
 
     // 几秒后滑出并移除弹窗
@@ -127,6 +128,7 @@ async login() {
         alertBox.style.opacity = '1';
       }, 0);
 
+      eventBus.emit('usernameUpdated', name);
       // 登录成功后将用户名传递到目标路由页面
       this.$router.push({ 
         path: '/waterfall-basic-knowledge',

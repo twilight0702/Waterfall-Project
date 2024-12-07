@@ -1,5 +1,5 @@
 <template>
-  <nav>
+  <nav :style="{ visibility: navbarHidden ? 'hidden' : 'visible' }">
     <div class="logo"></div>
     <ul>
       <li><router-link to="/waterfall-basic-knowledge">基础知识</router-link></li>
@@ -21,6 +21,8 @@
 </template>
 
 <script>
+// eventBus.js
+import eventBus from '@/eventBus'
 export default {
   name: 'NavBar',
   data() {
@@ -30,13 +32,25 @@ export default {
     };
   },
   created() {
-    // 在组件创建时获取用户名，假设用户名已通过路由状态传递
-    this.username = this.$route.state?.username || '未登录';
+    this.navbarHidden = 1;
+    if(!this.username)
+      this.username = "未登录";
+    eventBus.on('usernameUpdated', (newUsername) => {
+      if(newUsername)
+        this.username = newUsername;
+      this.navbarHidden = 0;
+    });
+  },
+  beforeDestroy() {
+    // 记得在组件销毁前移除事件监听
+    eventBus.off('usernameUpdated');
   },
   methods: {
     // 控制侧边栏的显示与隐藏
     toggleSidebar() {
       console.log('点击了用户名');  // 用于调试，检查点击事件是否触发
+      this.$router.push('/login');
+      // this.navbarHidden = 1;
       this.sidebarVisible = !this.sidebarVisible;
     },
     // 跳转到已做习题页面
@@ -112,6 +126,7 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 1%;
 }
 
 /* 侧边栏样式 */
