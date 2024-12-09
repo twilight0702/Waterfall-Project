@@ -17,17 +17,14 @@
 
     <!-- 主要内容区域 -->
     <div class="content">
-
       <!-- 显示章节内容 -->
       <div v-if="chapterContent && chapterContent.name" class="chapter-content">
         <h2>{{ chapterContent.name }}</h2>
         <p class="formatted-text" id="my-text">{{ chapterContent.text }}</p>
-      </div>
-
-
-      <!-- 显示对应图片 -->
-      <div v-if="chapterContent && chapterContent.image_url" class="chapter-image">
-        <img :src="chapterContent.image_url" alt="Chapter Image">
+        <!-- 显示对应图片 -->
+        <div v-if="chapterImage" class="chapter-image">
+        <img :src="chapterImage" alt="章节图片" @error="onImageError" />
+        </div>
       </div>
 
       <!-- 显示错误信息 -->
@@ -113,10 +110,21 @@
   color: white;
 }
 
-/* 其他内容样式保持不变 */
-.formatted-text {
-  white-space: pre-wrap;
+/* 章节图片样式 */
+
+.chapter-image {
+  display: flex;
+  justify-content: flex-start; 
+  align-items: center; /* 垂直居中对齐 */
+  height: 100%; /* 确保容器有高度 */
 }
+
+.chapter-image img {
+  max-width: 100%; /* 让图片宽度适应屏幕 */
+  max-height: 70vh; /* 限制图片的最大高度 */
+  object-fit: contain; /* 保持图片比例 */
+}
+
 </style>
 
 <script>
@@ -130,8 +138,9 @@ export default {
     return {
       selectedChapter: '瀑布模型的起源',  // 默认选择“瀑布模型的概念”
       chapterContent: null,  // 存储章节内容
-      errorMessage: '',     // 存储错误信息
-      searchQuery: '',      // 搜索框内容绑定
+      chapterImage: '',      // 存储章节图片路径
+      errorMessage: '',      // 存储错误信息
+      searchQuery: '',       // 搜索框内容绑定
     };
   },
   methods: {
@@ -139,9 +148,12 @@ export default {
     changeChapter({ chapterName }) {
       this.selectedChapter = chapterName;  // 更新章节名称
       this.chapterContent = null;  // 清空当前章节内容
-      this.errorMessage = '';  // 清空错误信息
+      this.chapterImage = '';     // 清空章节图片
+      this.errorMessage = '';     // 清空错误信息
 
-      this.fetchChapterContent(chapterName);  // 请求章节内容
+      // 同时获取章节内容和图片
+      this.fetchChapterContent(chapterName);
+      this.setChapterImage(chapterName);
     },
 
     // 请求章节内容
@@ -157,9 +169,8 @@ export default {
             const formattedText = this.chapterContent.text
               .split('\n')
               .map(line => {
-                if(line.length < 15)
-                  return `${line}`
-                else return `\t${line}`
+                if (line.length < 15) return `${line}`;
+                else return `\t${line}`;
               })
               .join('\n\n');
             this.chapterContent.text = formattedText;
@@ -169,10 +180,24 @@ export default {
         })
         .catch(error => {
           this.errorMessage = '请求失败，请稍后再试。';
-        })
-        .finally(() => {
-          console.log("over");
         });
+    },
+
+    // 设置章节图片
+    setChapterImage(chapterName) {
+      // 章节名称与图片路径的映射
+      const imageMap = {
+        '瀑布模型的起源': '/images/waterfall-origin.jpg', // 示例：瀑布模型的起源章节对应的图片
+        '优势': '/images/waterfall-advantage.jpg',
+        '常见问题及应对策略': '/images/waterfall-boundedness.jpg',
+        '与V模型': '/images/V-model.jpg',
+        '与螺旋模型': '/images/spin-model.jpg',
+        '系统设计': '/images/system-design.jpg',
+      };
+
+      // 设置 chapterImage
+      this.chapterImage = imageMap[chapterName] || ''; // 如果没有找到对应图片，设置为空字符串
+      console.log("当前章节图片路径：", this.chapterImage); // 打印图片路径用于调试
     },
 
     // 搜索章节
@@ -180,13 +205,31 @@ export default {
       // 当点击搜索按钮时，根据查询进行章节跳转
       if (this.searchQuery) {
         this.fetchChapterContent(this.searchQuery);
+        this.setChapterImage(this.searchQuery);  // 根据搜索结果设置图片
       } else {
         this.chapterContent = null;  // 如果没有输入内容，则清空章节内容
+        this.chapterImage = '';      // 清空图片
       }
+    },
+
+    // 图片加载错误处理
+    onImageError() {
+      console.error('图片加载失败:', this.chapterImage);
+      this.errorMessage = '图片加载失败，请检查图片路径。';
     }
   },
   created() {
+    // 初始加载时获取默认章节的内容和图片
     this.fetchChapterContent(this.selectedChapter);
+    this.setChapterImage(this.selectedChapter);
+  },
+
+  watch: {
+    // 监听selectedChapter的变化，确保章节变化时能够更新内容和图片
+    selectedChapter(newChapter) {
+      this.fetchChapterContent(newChapter);
+      this.setChapterImage(newChapter);
+    }
   }
 };
 </script>
