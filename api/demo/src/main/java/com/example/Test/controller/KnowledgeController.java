@@ -14,6 +14,7 @@ import java.util.Map;
 @RequestMapping("/knowledge")
 public class KnowledgeController {
 
+    String databaseName = "neo4j";
     private final KnowledgeService knowledgeService;
 
     public KnowledgeController(KnowledgeService knowledgeService) {
@@ -25,7 +26,7 @@ public class KnowledgeController {
             @PathVariable String id,
             @RequestParam(defaultValue = "neo4j") String databaseName) {
         // 调用服务层，传入 ID 和数据库名称
-        Map<String, Object> knowledge = knowledgeService.getKnowledgeById(id, "database3");
+        Map<String, Object> knowledge = knowledgeService.getKnowledgeById(id, databaseName);
 
         if (knowledge.containsKey("message") && "没找到".equals(knowledge.get("message"))) {
             // 返回 HTTP 状态码 404（Not Found）和错误信息
@@ -41,7 +42,7 @@ public class KnowledgeController {
             @PathVariable String name,
             @RequestParam(defaultValue = "neo4j") String databaseName) {
         // 调用服务层，传入 ID 和数据库名称
-        Map<String, Object> knowledge = knowledgeService.getKnowledgeByString(name, "database3");
+        Map<String, Object> knowledge = knowledgeService.getKnowledgeByString(name, databaseName);
 
         if (knowledge.containsKey("message") && "没找到".equals(knowledge.get("message"))) {
             // 返回 HTTP 状态码 404（Not Found）和错误信息
@@ -57,7 +58,7 @@ public class KnowledgeController {
     @GetMapping("/nodes-and-relationships")
     public ResponseEntity<Map<String, Object>> getSubjectsKnowledgeAndRelationships(
             @RequestParam(required = false, defaultValue = "neo4j") String databaseName) {
-        Map<String, Object> result = knowledgeService.getSubjectsKnowledgeAndRelationships("database3");
+        Map<String, Object> result = knowledgeService.getSubjectsKnowledgeAndRelationships(databaseName);
         if (result.containsKey("message") && "没有找到任何数据".equals(result.get("message"))) {
             return ResponseEntity.status(404).body(result);
         }
@@ -68,7 +69,7 @@ public class KnowledgeController {
     @GetMapping("/random-tests")
     public ResponseEntity<List<Map<String, Object>>> getRandomTests(
             @RequestParam int limit) {
-        List<Map<String, Object>> result = knowledgeService.getRandomTests("database3", limit);
+        List<Map<String, Object>> result = knowledgeService.getRandomTests(databaseName, limit);
         if (result.isEmpty()) {
             return ResponseEntity.status(404).body(Collections.emptyList());
         }
@@ -88,7 +89,7 @@ public class KnowledgeController {
         }
         System.out.println(" ");
 
-        List<Map<String, Object>> result = knowledgeService.getRandomTestsHasLimits("database3", limit , labels);
+        List<Map<String, Object>> result = knowledgeService.getRandomTestsHasLimits(databaseName, limit , labels);
         if (result.isEmpty()) {
             return ResponseEntity.status(404).body(Collections.emptyList());
         }
