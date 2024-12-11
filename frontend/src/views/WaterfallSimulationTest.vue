@@ -34,6 +34,7 @@
       <button @click="startQuiz">确认</button>
     </div>
 
+    <div class ="tests-container">
     <!-- 显示测验内容 -->
     <div v-if="isQuizStarted">
       <ul>
@@ -81,6 +82,7 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
@@ -104,14 +106,12 @@ export default {
         { name: '定义与概述' },
         { name: '阶段划分' },
         { name: '特点与优势' },
-        { name: '局限性' },
         { name: '常见问题及应对策略' },
         { name: '与其他模型的比较' },
         { name: '应用案例' },
         { name: '实施最佳实践' },
         { name: '改进方向' },
         { name: '总结与反思' },
-        { name: '部署与发布' },
       ], // 初始知识点选项
     };
   },
@@ -262,5 +262,9 @@ input[type="radio"] {
   margin-left: 5px;
   cursor: pointer;
   font-weight: bold;
+}
+
+.tests-container {
+  margin-top: 60px; /* 设置组件离页面顶部的距离 */
 }
 </style>
