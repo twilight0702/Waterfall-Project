@@ -11,18 +11,20 @@
     </div>
 
     <!-- 侧边栏 -->
-    <div v-if="sidebarVisible" class="sidebar">
+    <div :class="['sidebar', { show: sidebarVisible }]">
+      <div class="close-btn" @click="toggleSidebar">×</div> <!-- 关闭按钮 -->
       <ul>
         <li @click="goToCompletedExercises">已做习题</li>
         <li @click="goToWrongQuestions">错题集</li>
+        <li @click="goToGradeRecord">成绩记录</li> <!-- 新增的成绩记录菜单项 -->
       </ul>
     </div>
   </nav>
 </template>
 
 <script>
-// eventBus.js
 import eventBus from '@/eventBus'
+
 export default {
   name: 'NavBar',
   data() {
@@ -33,25 +35,20 @@ export default {
   },
   created() {
     this.navbarHidden = 1;
-    if(!this.username)
-      this.username = "未登录";
+    if (!this.username) this.username = "未登录";
     eventBus.on('usernameUpdated', (newUsername) => {
-      if(newUsername)
-        this.username = newUsername;
+      if (newUsername) this.username = newUsername;
       this.navbarHidden = 0;
     });
   },
   beforeDestroy() {
-    // 记得在组件销毁前移除事件监听
     eventBus.off('usernameUpdated');
   },
   methods: {
     // 控制侧边栏的显示与隐藏
     toggleSidebar() {
       console.log('点击了用户名');  // 用于调试，检查点击事件是否触发
-      this.$router.push('/login');
-      // this.navbarHidden = 1;
-      this.sidebarVisible = !this.sidebarVisible;
+      this.sidebarVisible = !this.sidebarVisible;  // 切换侧边栏的显示状态
     },
     // 跳转到已做习题页面
     goToCompletedExercises() {
@@ -60,6 +57,10 @@ export default {
     // 跳转到错题集页面
     goToWrongQuestions() {
       this.$router.push('/wrong-questions');
+    },
+    // 跳转到成绩记录页面
+    goToGradeRecord() {
+      this.$router.push('/grade-record');
     }
   }
 };
@@ -71,14 +72,14 @@ nav {
   position: fixed;
   top: 0;
   left: 0;
-  height: 45px;
-  background-color: var(--color-background-soft);
-  padding: 10px;
+  height: 50px;
+  background-color: #fff;
+  padding: 0 20px;
   width: 100%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 999;
   display: flex;
-  justify-content: space-between; /* 使左右两边内容分开 */
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -91,7 +92,7 @@ ul {
   justify-content: space-around;
   align-items: center;
   flex-wrap: wrap;
-  width: 70%; /* 限制导航栏宽度 */
+  width: 70%;
 }
 
 li {
@@ -103,69 +104,97 @@ a {
   font-weight: bold;
   padding: 10px 15px;
   border-radius: 5px;
-  color: var(--color-primary);
+  color: #333;
   transition: all 0.3s ease-in-out;
 }
 
 a:hover {
-  background-color: var(--color-primary-light);
-  color: rgb(0, 104, 61);
+  background-color: #e0f7fa;
+  color: #00796b;
 }
 
 .router-link-active {
-  background-color: var(--color-primary);
-  color: rgb(0, 104, 61);
+  background-color: #00796b;
+  color: #fff;
 }
 
 /* 用户名区域 */
 .user-info {
-  font-size: 15px;
-  color: var(--color-primary);
+  font-size: 16px;
+  color: #00796b;
   cursor: pointer;
   padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 1%;
+  transition: background-color 0.3s ease-in-out;
+  border-radius: 5px;
+}
+
+.user-info:hover {
+  background-color: #e0f7fa;
 }
 
 /* 侧边栏样式 */
 .sidebar {
   position: fixed;
-  top: 0;
+  top: 60px; /* 保持与导航栏的距离 */
   right: 0;
-  background-color: white;
-  width: 200px;
+  background: #ffffff;
+  width: 240px;
   height: 100vh;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1); /* 更柔和的阴影 */
   padding: 20px;
   z-index: 9999;
   transition: transform 0.3s ease-in-out;
   transform: translateX(100%); /* 初始状态右侧隐藏 */
+  border-radius: 10px 0 0 10px; /* 圆角效果 */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
+.sidebar.show {
+  transform: translateX(0); /* 侧边栏弹出 */
+}
+
+.sidebar .close-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #00796b;
+  transition: color 0.3s ease;
+}
+
+.sidebar .close-btn:hover {
+  color: #d32f2f;
+}
+
+/* 侧边栏菜单项 */
 .sidebar ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
+
 }
 
 .sidebar li {
-  padding: 15px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  font-size: 17px;
+  font-weight: normal;
+  margin-top: 15px;
+  padding: 12px 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border-radius: 8px;
+  color: #555;
 }
 
 .sidebar li:hover {
-  background-color: #f0f0f0;
-}
-
-.sidebar-enter-active, .sidebar-leave-active {
-  transition: transform 0.3s ease-in-out;
-}
-
-.sidebar-enter, .sidebar-leave-to /* .sidebar-leave-active in <2.1.8 */ {
-  transform: translateX(100%);
+  background-color: #00796b;
+  color: white;
 }
 
 /* 小屏幕时调整导航栏布局 */
