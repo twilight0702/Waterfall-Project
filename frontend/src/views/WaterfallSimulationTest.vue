@@ -197,6 +197,9 @@ button {
   border: none;
   cursor: pointer;
   border-radius: 10px;
+
+  display: block; /* 转换为块级元素 */
+  margin: 0 auto; /* 设置左右外边距为 auto 实现水平居中 */
 }
 
 button:hover {
@@ -266,5 +269,7 @@ input[type="radio"] {
 
 .tests-container {
   margin-top: 60px; /* 设置组件离页面顶部的距离 */
+  max-width: 800px
+  
 }
 </style>
