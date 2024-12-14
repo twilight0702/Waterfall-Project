@@ -25,6 +25,7 @@
 
 <script>
 import eventBus from '@/eventBus'
+import axios from 'axios'
 
 export default {
   name: 'NavBar',
@@ -55,7 +56,6 @@ export default {
   methods: {
     // 控制侧边栏的显示与隐藏
     toggleSidebar() {
-      console.log('点击了用户名');  // 用于调试，检查点击事件是否触发
       this.sidebarVisible = !this.sidebarVisible;  // 切换侧边栏的显示状态
     },
     // 跳转到已做习题页面
@@ -71,7 +71,9 @@ export default {
       this.$router.push('/grade-record');
     },
     logout() {
-      // 跳转到登录页面
+      const hash = this.$getHash();
+      console.log(hash);
+      axios.get(`/knowledge/removeUser?key=${hash}`);
       window.location.href = window.location.origin + '/login'; // 重新加载到新路径
     }
   }

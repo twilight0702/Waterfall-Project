@@ -1,7 +1,7 @@
 <template>
   <div class="login-page">
     <div class="login-container">
-      <h1>登录</h1>
+      <h1>登&nbsp;&nbsp;录</h1>
       <div class="login-form">
         <input v-model="name" placeholder="用户名" />
         <input v-model="Password" type="password" placeholder="密码" />
@@ -67,6 +67,9 @@ export default {
         }, 0);
 
         eventBus.emit('usernameUpdated', name);
+        const hash = this.$getHash();
+        axios.get(`/knowledge/addUser?key=${hash}&userName=${name}`);
+
         // 登录成功后将用户名传递到目标路由页面
         this.$router.push({
           path: '/waterfall-basic-knowledge',
@@ -129,10 +132,15 @@ export default {
         }, 0);
 
         eventBus.emit('usernameUpdated', name);
+        const hash = this.$getHash();
+        axios.get(`/knowledge/addUser?key=${hash}&userName=${name}`)
+          .then(response => {
+            console.log('API 响应数据：', response.data);
+            console.log('请求URL：', `knowledge/addUser?key=${hash}&userName=${name}`);
+          });
         // 登录成功后将用户名传递到目标路由页面
         this.$router.push({
           path: '/waterfall-basic-knowledge',
-          state: { username: name } // 将用户名存储在路由的 state 中
         });
 
         // 几秒后滑出并移除弹窗
@@ -169,18 +177,19 @@ export default {
 
 /* 登录容器 */
 .login-container {
-  background: white;
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   padding: 40px 30px;
   width: 400px;
   text-align: center;
+  backdrop-filter: blur(10000000px);
 }
 
 /* 标题样式 */
 h1 {
   color: #333;
-  font-size: 24px;
+  font-size: 30px;
   margin-bottom: 20px;
 }
 
@@ -217,7 +226,7 @@ h1 {
 button {
   width: 45%;
   padding: 12px 15px;
-  font-size: 16px;
+  font-size: 18px;
   color: white;
   background-color: #4caf50;
   border: none;

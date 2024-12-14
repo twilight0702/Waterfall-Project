@@ -1,10 +1,7 @@
 <template>
   <div class="waterfall-model-framework">
     <!-- 嵌入 HTML 文件 -->
-    <iframe 
-      src="./framework.html"   
-      class="framework-iframe"
-      title="知识框架图谱">
+    <iframe src="./framework.html" class="framework-iframe" title="知识框架图谱">
     </iframe>
   </div>
 </template>
@@ -12,6 +9,9 @@
 <script>
 export default {
   name: 'WaterfallModelFramework',
+  created() {
+    this.$getUser();
+  },
 };
 </script>
 
@@ -27,7 +27,9 @@ export default {
 
 .framework-iframe {
   width: 1750px;
-  height: 90vh; /* 根据页面需求调整高度 */
-  border: none; /* 去除 iframe 边框 */
+  height: 90vh;
+  /* 根据页面需求调整高度 */
+  border: none;
+  /* 去除 iframe 边框 */
 }
 </style>
