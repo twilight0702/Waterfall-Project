@@ -27,67 +27,67 @@ export default {
   },
   methods: {
     // 登录逻辑
-async login() {
-  const { name, Password } = this;
+    async login() {
+      const { name, Password } = this;
 
-  if (!name || !Password) {
-    alert('用户名和密码不能为空');
-    return;
-  }
+      if (!name || !Password) {
+        alert('用户名和密码不能为空');
+        return;
+      }
 
-  try {
-    console.log('用户名:', name);
-    console.log('密码:', Password);
-    const response = await axios.post('http://localhost:3000/login', {
-      username: name,
-      password: Password,
-    });
+      try {
+        console.log('用户名:', name);
+        console.log('密码:', Password);
+        const response = await axios.post('http://localhost:3000/login', {
+          username: name,
+          password: Password,
+        });
 
-      // 显示弹窗
-      const alertBox = document.createElement('div');
-      alertBox.textContent = '登录成功！';
-      alertBox.style.position = 'fixed';
-      alertBox.style.top = '-50px'; // 初始位置在屏幕上方
-      alertBox.style.left = '50%';
-      alertBox.style.transform = 'translateX(-50%)';
-      alertBox.style.opacity = '0';
-      alertBox.style.backgroundColor = '#4caf50';
-      alertBox.style.color = '#fff';
-      alertBox.style.padding = '10px 20px';
-      alertBox.style.borderRadius = '5px';
-      alertBox.style.boxShadow = '0px 2px 10px rgba(0, 0, 0, 0.2)';
-      alertBox.style.zIndex = 1000;
-      alertBox.style.transition = 'opacity 0.5s ease, top 0.5s ease'; // 动画效果
-      document.body.appendChild(alertBox);
+        // 显示弹窗
+        const alertBox = document.createElement('div');
+        alertBox.textContent = '登录成功！';
+        alertBox.style.position = 'fixed';
+        alertBox.style.top = '-50px'; // 初始位置在屏幕上方
+        alertBox.style.left = '50%';
+        alertBox.style.transform = 'translateX(-50%)';
+        alertBox.style.opacity = '0';
+        alertBox.style.backgroundColor = '#4caf50';
+        alertBox.style.color = '#fff';
+        alertBox.style.padding = '10px 20px';
+        alertBox.style.borderRadius = '5px';
+        alertBox.style.boxShadow = '0px 2px 10px rgba(0, 0, 0, 0.2)';
+        alertBox.style.zIndex = 1000;
+        alertBox.style.transition = 'opacity 0.5s ease, top 0.5s ease'; // 动画效果
+        document.body.appendChild(alertBox);
 
-      // 触发动画效果：从上到下滑入
-      setTimeout(() => {
-        alertBox.style.top = '20px'; // 目标位置
-        alertBox.style.opacity = '1';
-      }, 0);
+        // 触发动画效果：从上到下滑入
+        setTimeout(() => {
+          alertBox.style.top = '20px'; // 目标位置
+          alertBox.style.opacity = '1';
+        }, 0);
 
-      eventBus.emit('usernameUpdated', name);
-      // 登录成功后将用户名传递到目标路由页面
-      this.$router.push({ 
-        path: '/waterfall-basic-knowledge',
-      });
+        eventBus.emit('usernameUpdated', name);
+        // 登录成功后将用户名传递到目标路由页面
+        this.$router.push({
+          path: '/waterfall-basic-knowledge',
+        });
 
-    // 几秒后滑出并移除弹窗
-    setTimeout(() => {
-      alertBox.style.top = '-50px'; // 返回到上方
-      alertBox.style.opacity = '0';
+        // 几秒后滑出并移除弹窗
+        setTimeout(() => {
+          alertBox.style.top = '-50px'; // 返回到上方
+          alertBox.style.opacity = '0';
 
-      // 动画结束后移除弹窗
-      setTimeout(() => {
-        document.body.removeChild(alertBox);
-      }, 500); // 与滑出动画时间保持一致
-    }, 2000); // 设置为 2 秒后开始滑出
+          // 动画结束后移除弹窗
+          setTimeout(() => {
+            document.body.removeChild(alertBox);
+          }, 500); // 与滑出动画时间保持一致
+        }, 2000); // 设置为 2 秒后开始滑出
 
 
 
-  } catch (err) {
-    alert(err.response?.data || '登录失败');
-  }
+      } catch (err) {
+        alert(err.response?.data || '登录失败');
+      }
     },
 
     // 注册逻辑
@@ -105,46 +105,46 @@ async login() {
           password: Password,
         });
 
-            // 显示弹窗
-      const alertBox = document.createElement('div');
-      alertBox.textContent = '注册成功！';
-      alertBox.style.position = 'fixed';
-      alertBox.style.top = '-50px'; // 初始位置在屏幕上方
-      alertBox.style.left = '50%';
-      alertBox.style.transform = 'translateX(-50%)';
-      alertBox.style.opacity = '0';
-      alertBox.style.backgroundColor = '#4caf50';
-      alertBox.style.color = '#fff';
-      alertBox.style.padding = '10px 20px';
-      alertBox.style.borderRadius = '5px';
-      alertBox.style.boxShadow = '0px 2px 10px rgba(0, 0, 0, 0.2)';
-      alertBox.style.zIndex = 1000;
-      alertBox.style.transition = 'opacity 0.5s ease, top 0.5s ease'; // 动画效果
-      document.body.appendChild(alertBox);
-
-      // 触发动画效果：从上到下滑入
-      setTimeout(() => {
-        alertBox.style.top = '20px'; // 目标位置
-        alertBox.style.opacity = '1';
-      }, 0);
-
-      eventBus.emit('usernameUpdated', name);
-      // 登录成功后将用户名传递到目标路由页面
-      this.$router.push({ 
-        path: '/waterfall-basic-knowledge',
-        state: { username: name } // 将用户名存储在路由的 state 中
-      });
-
-      // 几秒后滑出并移除弹窗
-      setTimeout(() => {
-        alertBox.style.top = '-50px'; // 返回到上方
+        // 显示弹窗
+        const alertBox = document.createElement('div');
+        alertBox.textContent = '注册成功！';
+        alertBox.style.position = 'fixed';
+        alertBox.style.top = '-50px'; // 初始位置在屏幕上方
+        alertBox.style.left = '50%';
+        alertBox.style.transform = 'translateX(-50%)';
         alertBox.style.opacity = '0';
+        alertBox.style.backgroundColor = '#4caf50';
+        alertBox.style.color = '#fff';
+        alertBox.style.padding = '10px 20px';
+        alertBox.style.borderRadius = '5px';
+        alertBox.style.boxShadow = '0px 2px 10px rgba(0, 0, 0, 0.2)';
+        alertBox.style.zIndex = 1000;
+        alertBox.style.transition = 'opacity 0.5s ease, top 0.5s ease'; // 动画效果
+        document.body.appendChild(alertBox);
 
-        // 动画结束后移除弹窗
+        // 触发动画效果：从上到下滑入
         setTimeout(() => {
-          document.body.removeChild(alertBox);
-        }, 500); // 与滑出动画时间保持一致
-      }, 2000); // 设置为 2 秒后开始滑出
+          alertBox.style.top = '20px'; // 目标位置
+          alertBox.style.opacity = '1';
+        }, 0);
+
+        eventBus.emit('usernameUpdated', name);
+        // 登录成功后将用户名传递到目标路由页面
+        this.$router.push({
+          path: '/waterfall-basic-knowledge',
+          state: { username: name } // 将用户名存储在路由的 state 中
+        });
+
+        // 几秒后滑出并移除弹窗
+        setTimeout(() => {
+          alertBox.style.top = '-50px'; // 返回到上方
+          alertBox.style.opacity = '0';
+
+          // 动画结束后移除弹窗
+          setTimeout(() => {
+            document.body.removeChild(alertBox);
+          }, 500); // 与滑出动画时间保持一致
+        }, 2000); // 设置为 2 秒后开始滑出
 
       } catch (err) {
         alert(err.response?.data || '注册失败');
@@ -162,7 +162,8 @@ async login() {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #ffffff, #4f86e6); /* 渐变背景 */
+  background: linear-gradient(135deg, #ffffff, #4f86e6);
+  /* 渐变背景 */
   font-family: 'Arial', sans-serif;
 }
 
@@ -182,14 +183,17 @@ h1 {
   font-size: 24px;
   margin-bottom: 20px;
 }
+
 .button-group {
   display: flex;
   justify-content: center;
-  margin-top: 10px; /* 增加按钮组上方的间距 */
+  margin-top: 10px;
+  /* 增加按钮组上方的间距 */
 }
 
 .button-group button {
-  margin: 0 10px; /* 设置按钮之间的水平间距 */
+  margin: 0 10px;
+  /* 设置按钮之间的水平间距 */
 }
 
 /* 表单样式 */
