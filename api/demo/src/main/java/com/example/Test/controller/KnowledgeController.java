@@ -1,14 +1,11 @@
 package com.example.Test.controller;
 
 import com.example.Test.service.KnowledgeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.Test.service.CurrUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/knowledge")
@@ -94,5 +91,85 @@ public class KnowledgeController {
             return ResponseEntity.status(404).body(Collections.emptyList());
         }
         return ResponseEntity.ok(result);
+    }
+
+    ///存储用户信息
+    /// @param userData: 用户信息，包括一个 name 字段
+    /// @return 返回存储结果
+    @PostMapping("/saveUserNode")
+    public ResponseEntity<String> saveUserNode(@RequestBody Map<String, Object> userData) {
+        String name = (String) userData.get("userName");
+        if(knowledgeService.saveUserNode(name,databaseName))
+        {
+            System.out.printf("存储用户信息成功！名字:%s\n",name);
+            return ResponseEntity.ok("存储用户信息成功！");
+        }
+        return ResponseEntity.status(500).body("存储用户信息失败");
+    }
+
+    ///存储题目（同时可以用于写过的题目和错题存储）
+    /// @param data 输入的请求体Map<String,Object>，包括一个题目信息的list，名字是testData，一个用户信息，名字是userName
+    /// @param rela 需要保存的题目类型，如果是写过的题目，是HAVE_DONE，如果是错题，是INCORRECT
+    @PostMapping("/saveTest")
+    public ResponseEntity<String> saveDoneTest(@RequestBody Map<String,Object> data,
+    @RequestParam String rela) {
+        List<Map<String,Map<String,Object>>> testData=(List<Map<String,Map<String,Object>>>) data.get("testData");
+        String userIDString = (String) data.get("userName");
+        if(knowledgeService.saveTest(testData,userIDString,databaseName,rela))
+        {
+            System.out.println("存储题目数据成功");
+            return ResponseEntity.ok("存储题目数据成功");
+        }
+    return ResponseEntity.status(500).body("存储题目数据失败");
+    }
+
+    ///获取用户写过的所有题目
+    /// @param userName 是被查询的用户的名字
+    /// @param rela 需要查询的题目类型，如果是写过的题目，是HAVE_DONE，如果是错题，是INCORRECT
+    @GetMapping("/getTest")
+    public ResponseEntity<Map<String, Object>> getDoneTests(@RequestParam String userName,@RequestParam String rela) {
+        Map<String,Object> returnResult = knowledgeService.getDoneTests(userName,databaseName,rela);
+
+        return ResponseEntity.ok(returnResult);
+    }
+
+    ///存储测试信息节点
+    @PostMapping("/saveExamination")
+    public ResponseEntity<String> saveTestInfo(@RequestBody Map<String,Object> data) {
+        String userName=(String)data.get("userName");
+        Map<String,Object> examination=(Map<String,Object>)data.get("examination");
+        if(knowledgeService.saveExamination(examination,userName,databaseName)) {
+            return ResponseEntity.ok("存储测试信息成功");
+        }
+        else {
+            return ResponseEntity.status(500).body("存储测试信息失败");
+        }
+    }
+
+    ///获取测试信息节点
+//    @GetMapping("/getExamination")
+//    public ResponseEntity<Map<String, Object>> getExamination(@RequestParam String userName) {
+//    }
+
+
+    ///添加在线用户
+    @GetMapping("/addUser")
+    public ResponseEntity<String> addUser(@RequestParam Integer key,@RequestParam String userName) {
+        CurrUser.addUser(key,userName);
+        return ResponseEntity.ok("设置用户名成功");
+    }
+
+    ///用key查询在线用户的名字
+    @GetMapping("/findUser")
+    public ResponseEntity<String> findUser(@RequestParam Integer key) {
+        String name=CurrUser.findUser(key);
+        return ResponseEntity.ok(name);
+    }
+
+    ///删除在线用户
+    @GetMapping("/removeUser")
+    public ResponseEntity<String> removeUser(@RequestParam Integer key) {
+        CurrUser.removeUser(key);
+        return ResponseEntity.ok("删除用户成功");
     }
 }

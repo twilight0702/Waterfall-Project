@@ -1,13 +1,13 @@
 package com.example.Test.service;
 
-import org.neo4j.driver.Driver;
-import org.neo4j.driver.Session;
-import org.neo4j.driver.Result;
-import org.neo4j.driver.SessionConfig;
+import org.neo4j.driver.*;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.types.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.List;
 
 @Service
 public class KnowledgeService {
@@ -127,7 +127,6 @@ RETURN subjectNodes, collect(DISTINCT {id: id(allKnowledge), labels: labels(allK
             params.put("limit", limit);
             params.put("labels", labels);
 
-            System.out.println("数据库访问语句"+query);
             Result result = session.run(query, params);
 
             if (result.hasNext()) {
@@ -139,4 +138,154 @@ RETURN subjectNodes, collect(DISTINCT {id: id(allKnowledge), labels: labels(allK
             throw new RuntimeException("Failed to query Neo4j: " + e.getMessage(), e);
         }
     }
+
+    ///在数据库中存储用户信息
+    public Boolean saveUserNode(String name,String databaseName){
+        try (Session session = neo4jDriver.session(SessionConfig.forDatabase(databaseName))) {
+            String query = "CREATE (:User {name: $name})";
+            Map<String, Object> params = new HashMap<>();
+            params.put("name", name);
+
+            Result result = session.run(query, params);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    ///在数据库中存储题目数据
+    /// @param testData 前端返回题目数据
+    /// @param userName 写这些题目的用户名字
+    /// @param databaseName 存储的数据库名字
+    public Boolean saveTest(List<Map<String,Map<String,Object>>> testData,String userName,String databaseName,String rela){
+        try (Session session = neo4jDriver.session(SessionConfig.forDatabase(databaseName))) {
+            for(Map<String,Map<String,Object>> test:testData)
+            {
+                Map<String,Object> properties = test.get("properties");
+                if(!checkIfTheTestHasBeenDone(userName,(String)properties.get("id"),rela)) {
+                    System.out.println("题目没有存储过");
+                    session.executeWrite(tx -> saveNode(tx, properties, userName, rela));
+                }
+                else{
+                    System.out.println("题目已经存储过");
+                }
+            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    ///存储题目节点
+    private Void saveNode(TransactionContext tx, Map<String, Object> properties,String userName,String rela) {
+        String cypherQuery = String.format("MATCH (u:User {name: $userName}), (t:test {id: $id}) CREATE (u)-[:%s]->(t)", rela);
+        tx.run(cypherQuery, Map.of("userName", userName, "id", properties.get("id")));
+        return null;
+    }
+
+    ///判断这道题目是否已经存储过了
+    /// @return true表示已经存储过了，false表示没有存储过
+    private Boolean checkIfTheTestHasBeenDone(String userName,String testID,String rela) {
+        try (Session session = neo4jDriver.session()) {
+            String cypherQuery = String.format("MATCH (u:User {name: $userName})-[r:%s]->(t:test {id: $testID}) RETURN count(r) > 0", rela);
+            Map<String, Object> params = new HashMap<>();
+            params.put("userName", userName);
+            params.put("testID", testID);
+            Result result=session.run(cypherQuery, params);
+
+            if (result.hasNext()) {
+                return result.next().get("count(r) > 0").asBoolean();
+            }
+            else {
+                throw new RuntimeException("查询做过的题目出错!");
+            }
+        }
+        catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
+    ///获取用户写过的所有题目
+    public Map<String ,Object> getDoneTests(String userName,String databaseName,String rela) {
+        Map<String,Object> nodes=new HashMap<>();
+        List<Map<String,Object>> tests=new ArrayList<>();
+        try (Session session = neo4jDriver.session(SessionConfig.forDatabase(databaseName))) {
+            String query = String.format("MATCH (u:User {name: $userName})-[r:%s]->(t:test) RETURN t",rela);
+            Map<String, Object> params = new HashMap<>();
+            params.put("userName", userName);
+            Result result = session.run(query, params);
+
+            if(result.hasNext()) {
+                nodes.put("status","ok");
+            }
+            else{
+                nodes.put("status","no Tests");
+                return nodes;
+            }
+            while(result.hasNext()) {
+                Record record=result.next();
+                Node node=record.get("t").asNode();
+                Map<String,Object> tempTest=node.asMap();
+                tests.add(tempTest);
+            }
+            nodes.put("tests",tests);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            nodes.put("status","error");
+        }
+        return nodes;
+    }
+
+    ///保存测试信息
+    public Boolean saveExamination(Map<String,Object> examination,String userName,String databaseName)
+    {
+        String grade=(String)examination.get("grade");
+        String number_of_tests=(String)examination.get("number_of_tests");
+        String correctness=(String)examination.get("correctness");
+        String test_list=(String)examination.get("test_list");
+
+        String[] testList=test_list.split(",");
+        try (Session session = neo4jDriver.session(SessionConfig.forDatabase(databaseName))) {
+            String createExaminationQuery = "CREATE (n:Examination {grade: $grade, number_of_tests: $number_of_tests, correctness: $correctness, test_list: $test_list}) RETURN ID(n)";
+            Map<String, Object> examinationParams = Map.of(
+                    "grade", grade,
+                    "number_of_tests", number_of_tests,
+                    "correctness", correctness,
+                    "test_list", test_list
+            );
+            Long examNodeID = session.run(createExaminationQuery, examinationParams)
+                    .single()
+                    .get("ID(n)")
+                    .asLong();
+
+            // 将 User 和 Examination 节点相连
+            String linkQuery = "MATCH (u:User {name: $userName}), (e:Examination) WHERE ID(e) = $examinationId CREATE (u)-[:EXAM]->(e)";
+            Map<String, Object> linkParams = Map.of(
+                    "userName", userName,
+                    "examinationId", examNodeID
+            );
+            session.run(linkQuery, linkParams);
+            for(String testID:testList)
+            {
+                String query="MATCH (n:Examination),(t:test{id:$testID}) WHERE ID(n) =$examNodeID CREATE (n)-[:HAS_TEST]->(t)";
+                session.run(query,Map.of("testID",testID,"examNodeID",examNodeID));
+            }
+
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    ///获取历次考试信息
+//    public Map<String, Object> getExaminations(String userName,String databaseName) {
+//    }
 }
