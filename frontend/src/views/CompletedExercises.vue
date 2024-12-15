@@ -24,8 +24,8 @@
             <p>知识点：{{ question.kn }}</p>
             <p>A：{{ question.A }}</p>
             <p>B：{{ question.B }}</p>
-            <p>C：{{ question.C }}</p>
-            <p>D：{{ question.D }}</p>
+            <p v-if="question.C">C：{{ question.C }}</p>
+            <p v-if="question.D">D：{{ question.D }}</p>
             <p>正确答案：{{ question.correctAnswer }}</p>
             <p>用户答案：{{ question.userAnswer }}</p>
           </div>

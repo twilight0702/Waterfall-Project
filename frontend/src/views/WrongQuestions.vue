@@ -2,19 +2,63 @@
   <div class="completed-exercises">
     <h1>错题合集</h1>
     <div class="main-content">
+
+      <div class="incorrect-questions">
+        <h2>选中的错题：</h2>
+        <div class="incorrect-list">
+          <div class="incorrect-card" v-for="question in selectedMistakes">
+            <p>{{ question.index }}</p>
+          </div>
+        </div>
+        <button v-if="!redoMode && selectedMistakes.length > 0" @click="enterRedoMode" class="redo-btn">
+          重做
+        </button>
+        <button v-if="redoMode" @click="submitQuiz" class="redo-btn">
+          提交
+        </button>
+        <h2 v-if="score != null">分数：{{ score }}</h2>
+      </div>
+
+
       <div class="question-records">
         <div class="question-list">
-          <div class="question-card" v-if="selectedExam.questions.length > 0"
-            v-for="(question, index) in selectedExam.questions" :key="index">
+          <div class="question-card" v-if="selectedExam.questions.length > 0 && !redoMode"
+            v-for="(question, index) in selectedExam.questions" :key="index" @click="addToRedo(question, index)">
             <p>题目{{ index + 1 }}：{{ question.text }}</p>
             <p>知识点：{{ question.kn }}</p>
             <p>A：{{ question.A }}</p>
             <p>B：{{ question.B }}</p>
-            <p>C：{{ question.C }}</p>
-            <p>D：{{ question.D }}</p>
+            <p v-if="question.C">C：{{ question.C }}</p>
+            <p v-if="question.D">D：{{ question.D }}</p>
             <p>正确答案：{{ question.correctAnswer }}</p>
             <p>用户答案：{{ question.userAnswer }}</p>
           </div>
+
+          <div class="question-card" v-if="selectedMistakes.length > 0 && redoMode"
+            v-for="question in selectedMistakes">
+            <p>题目{{ question.index }}：{{ question.text }}</p>
+            <p>知识点：{{ question.kn }}</p>
+            <div class="choseAnser">
+              <span v-if="question.A">
+                <input type="radio" :name="'question-' + question.index" :value="'A'" v-model="question.userNewAnswer">
+                A：{{ question.A }}
+              </span>
+              <span v-if="question.B">
+                <input type="radio" :name="'question-' + question.index" :value="'B'" v-model="question.userNewAnswer">
+                B：{{ question.B }}
+              </span>
+              <span v-if="question.C">
+                <input type="radio" :name="'question-' + question.index" :value="'C'" v-model="question.userNewAnswer">
+                C：{{ question.C }}
+              </span>
+              <span v-if="question.D">
+                <input type="radio" :name="'question-' + question.index" :value="'D'" v-model="question.userNewAnswer">
+                D：{{ question.D }}
+              </span>
+
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -33,8 +77,12 @@ export default {
       examRecords: [],
       selectedExam: {
         questions: []
-      }, // 用于存储选中的考试记录
+      },
+      selectedMistakes: [],
       username: '-114514',
+      redoMode: false,
+      questionsForSubmit: [],
+      score: null,
     };
   },
   created() {
@@ -99,6 +147,7 @@ export default {
             .then(response => {
               let data = response.data;
               let singleQuestion = {
+                id: id,
                 text: data.text,
                 kn: data.kn,
                 A: data.A,
@@ -113,6 +162,66 @@ export default {
         });
       })
     },
+    addToRedo(item, index) {
+      item.index = index + 1;
+      item.userNewAnswer = null;
+      console.log("item:", item);
+      if (this.selectedMistakes.includes(item)) {
+        this.selectedMistakes.splice(this.selectedMistakes.indexOf(item), 1);
+      } else
+        this.selectedMistakes.push(item);
+    },
+    enterRedoMode() {
+      // 进入重做模式，更新界面为做题状态
+      this.redoMode = true;
+    },
+    submitQuiz() {
+      let totalScore = 0;
+      this.questionsForSubmit = []; // 清空错误题目
+      const timestampInSeconds = Math.floor(Date.now() / 1000);
+      let testData = {
+        results: [],
+        score: 0,
+        username: this.username.toString(),
+        testId: timestampInSeconds.toString(),
+      }
+      console.log("username:", this.username);
+      // 遍历所有题目，检查答案
+      this.selectedMistakes.forEach((item) => {
+        let singleData = {
+          id: item.id,
+          userAnswer: item.userNewAnswer || "none",
+          answer: item.correctAnswer,
+          isCorrect: (item.userNewAnswer === item.correctAnswer).toString(),
+        };
+        if (singleData.isCorrect == "true") {
+          totalScore += 10; // 每道题10分
+        }
+        testData.results.push(singleData);
+      });
+      testData.score = totalScore.toString();
+      let testData_json = JSON.stringify(testData);
+      console.log("提交的测试数据：", testData_json);
+
+      axios.post("/knowledge/submit-test", testData_json, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then((response) => {
+          if (response.data === "success") {
+            console.log("提交成功");
+          }
+          else throw new Error("提交失败");
+        })
+        .catch((error) => {
+          console.error("提交失败", error);
+        });
+
+      this.score = totalScore; // 更新成绩
+    },
+
+
   },
 };
 </script>
@@ -133,8 +242,54 @@ export default {
   width: 90vw;
 }
 
+.incorrect-questions {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  height: 45px;
+  margin-bottom: 10px;
+}
+
+.incorrect-list {
+  background-color: rgb(95, 210, 179);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  height: 100%;
+  width: 70%;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.incorrect-card {
+  background-color: #f8f8f8;
+  border-radius: 16px;
+  align-self: center;
+  text-align: center;
+  width: 30px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.redo-btn {
+  font-size: 20px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.redo-btn:hover {
+  background-color: #45a049;
+}
+
 .question-records {
-  height: calc(85vh - 50px);
+  height: 70vh;
 }
 
 .question-list {
@@ -159,5 +314,37 @@ export default {
   padding: 15px;
   cursor: pointer;
   width: 95%;
+}
+
+.choseAnser {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f8f8f8;
+  margin: 5px;
+}
+
+input {
+  appearance: none;
+  border: 1px solid #ccc;
+  border-radius: 20%;
+  align-self: center;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  position: relative;
+}
+
+input:checked::before {
+  content: '✔';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  color: green;
 }
 </style>
