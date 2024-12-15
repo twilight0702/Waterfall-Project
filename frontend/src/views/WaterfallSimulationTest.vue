@@ -131,6 +131,10 @@ export default {
         this.selectedKnowledgePoints.splice(index, 1);
       }
       console.log("当前选中的知识点：", this.selectedKnowledgePoints.map(item => item.name));
+      if (this.selectedKnowledgePoints.length > this.questionCount) {
+        this.questionCount = this.selectedKnowledgePoints.length;
+      }
+
     },
 
 
