@@ -3,27 +3,26 @@
     <!-- 选择题目数量和知识点范围 -->
     <div v-if="!isQuizStarted">
       <div class="form-group">
-        <label for="questionCount">题目数量:</label>
-        <input type="number" id="questionCount" v-model="questionCount" min="1" />
+        <div>
+          <label for="questionCount">题目数量:</label>
+          <input type="number" id="questionCount" v-model="questionCount" min="1" />
+        </div>
       </div>
 
       <div class="form-group">
         <label for="knowledgeRange">知识点范围:</label>
-        <!-- 使用 vue-multiselect 实现多选下拉框 -->
-        <multiselect v-model="selectedKnowledgePoints" :options="knowledgeOptions" :multiple="true"
-          :closeOnSelect="false" placeholder="请选择知识点范围" track-by="name" label="name" :allow-empty="false">
-          <!-- 自定义选中项的显示 -->
-          <template #tag="{ option, remove }">
-            <span class="custom-tag">
-              {{ option.name }}
-              <span class="remove-tag" @click="remove(option)">×</span>
-            </span>
-          </template>
+        <div class="button-grid">
+          <!-- 使用 v-for 渲染知识点范围的按钮 -->
+          <button v-for="option in knowledgeOptions" :key="option.id"
+            :class="['option-button', { selected: selectedKnowledgePoints.includes(option) }]"
+            @click="toggleKnowledgePoint(option)">
+            {{ option.name }}
+          </button>
+        </div>
 
-        </multiselect>
       </div>
 
-      <button @click="startQuiz">确认</button>
+      <button @click="startQuiz">确 认</button>
     </div>
 
     <div class="tests-container">
@@ -80,14 +79,24 @@
 
 <script>
 import axios from 'axios';
-import Multiselect from 'vue-multiselect';  // 引入 vue-multiselect 组件
+import eventBus from '@/eventBus';
 
 export default {
-  components: {
-    Multiselect  // 注册组件
-  },
   created() {
-    this.$getUser();
+    const hash = this.$getHash();
+    axios.get(`/knowledge/findUser?key=${hash}`)
+      .then(response => {
+        console.log('获取用户信息成功：', response.data);
+        if (response.data == "-114514")
+          window.location.href = window.location.origin + '/login';
+        else {
+          eventBus.emit('usernameUpdated', response.data);
+          this.username = response.data;
+        }
+      })
+      .catch(error => {
+        console.error('获取用户信息失败：', error);
+      });
   },
   data() {
     return {
@@ -98,19 +107,33 @@ export default {
       score: null, // 存储成绩
       incorrectAnswers: [], // 存储错误题目的信息
       knowledgeOptions: [
-        { name: '定义与概述' },
-        { name: '阶段划分' },
-        { name: '特点与优势' },
-        { name: '常见问题及应对策略' },
-        { name: '与其他模型的比较' },
-        { name: '应用案例' },
-        { name: '实施最佳实践' },
-        { name: '改进方向' },
-        { name: '总结与反思' },
+        { id: 1, name: '定义与概述' },
+        { id: 2, name: '阶段划分' },
+        { id: 3, name: '特点与优势' },
+        { id: 4, name: '常见问题及应对策略' },
+        { id: 5, name: '与其他模型的比较' },
+        { id: 6, name: '应用案例' },
+        { id: 7, name: '实施最佳实践' },
+        { id: 8, name: '改进方向' },
+        { id: 9, name: '总结与反思' },
       ], // 初始知识点选项
+      username: "-114514",
     };
   },
   methods: {
+
+    toggleKnowledgePoint(option) {
+      // 切换知识点选中状态
+      const index = this.selectedKnowledgePoints.findIndex((item) => item.id === option.id);
+      if (index === -1) {
+        this.selectedKnowledgePoints.push(option);
+      } else {
+        this.selectedKnowledgePoints.splice(index, 1);
+      }
+      console.log("当前选中的知识点：", this.selectedKnowledgePoints.map(item => item.name));
+    },
+
+
     // 获取数据，根据题目数量和知识点范围
     fetchData() {
       console.log("获取题目数量：" + this.questionCount + " 知识点范围：" + this.selectedKnowledgePoints.map(item => item.name));
@@ -160,9 +183,22 @@ export default {
     submitQuiz() {
       let totalScore = 0;
       this.incorrectAnswers = []; // 清空错误题目
-
+      const timestampInSeconds = Math.floor(Date.now() / 1000);
+      let testData = {
+        results: [],
+        score: 0,
+        username: this.username,
+        testId: timestampInSeconds,
+      }
+      console.log("username:", this.username);
       // 遍历所有题目，检查答案
       this.data.forEach((item) => {
+        let singleData = {
+          id: item.properties.id,
+          userAnswer: item.userAnswer || "none",
+          answer: item.properties.answer,
+          isCorrect: item.userAnswer === item.properties.answer,
+        };
         if (item.userAnswer === item.properties.answer) {
           totalScore += 10; // 每道题10分
         } else {
@@ -173,7 +209,22 @@ export default {
             answer: item.properties.answer,
           });
         }
+        testData.results.push(singleData);
       });
+      testData.score = totalScore;
+      let testData_json = JSON.stringify(testData);
+      console.log("提交的测试数据：", testData_json);
+
+      axios.post("/knowledge/submit-test", testData_json)
+        .then((response) => {
+          if (response.data === "success") {
+            console.log("提交成功");
+          }
+          else throw new Error("提交失败");
+        })
+        .catch((error) => {
+          console.error("提交失败", error);
+        });
 
       this.score = totalScore; // 更新成绩
     },
@@ -185,9 +236,10 @@ export default {
 /* 样式部分 */
 button {
   margin-top: 20px;
+  font-size: large;
   height: 50px;
-  width: 300px;
-  background-color: #007bff;
+  width: 350px;
+  background-color: rgb(33, 90, 136);
   color: white;
   border: none;
   cursor: pointer;
@@ -230,38 +282,51 @@ input[type="radio"] {
 
 .form-group {
   margin-bottom: 20px;
-  width: 300px;
+  width: 500px;
 }
 
-.form-group label {
-  display: block;
+.form-group label,
+.form-group input {
+  font-size: large;
+  display: inline-flex;
   margin-bottom: 10px;
+  align-items: center;
+  margin-left: 5%;
 }
 
 .form-group input {
-  width: 100%;
+  width: auto;
+  margin-left: 20px;
   height: 40px;
   padding: 8px;
 }
 
-.value-input {
-  width: 100%;
-  padding: 8px;
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
 }
 
-.custom-tag {
-  background-color: #007bff;
-  color: white;
-  border-radius: 4px;
-  padding: 3px 8px;
-  margin: 1px 5px 5px 0;
-  display: inline-block;
-}
-
-.remove-tag {
-  margin-left: 5px;
+.option-button {
+  font-size: large;
+  width: 140px;
+  height: 70px;
+  background-color: #38c4b3;
+  box-shadow: 4px 4px 10px rgba(54, 124, 118, 0.2);
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: bold;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+
+.option-button.selected {
+  background-color: #1f9dce;
+  /* 选中时的背景色 */
+  color: white;
+}
+
+.option-button:hover {
+  background-color: #1f9dce;
 }
 
 .tests-container {

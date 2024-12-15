@@ -14,7 +14,7 @@ app.config.globalProperties.$getHash = function () {
     const language = navigator.language;
 
     const deviceInfo = `${userAgent}-${language}`;
-    console.log('设备信息：', deviceInfo);
+    // console.log('设备信息：', deviceInfo);
 
     // 使用哈希函数生成唯一 ID
     let hash = 0;
