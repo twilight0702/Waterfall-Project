@@ -102,16 +102,17 @@ export default {
       const topicErrors = {};
       this.examRecords.forEach(exam => {
         exam.questions.forEach(question => {
-          if (question.correctAnswer !== question.userAnswer) {
-            if (!topicErrors[question.kn]) {
-              topicErrors[question.kn] = { total: 0, errors: 0 };
-            }
-            topicErrors[question.kn].total++;
+          if (!topicErrors[question.kn]) {
+            topicErrors[question.kn] = { total: 0, errors: 0 };
+          }
+          if (question.correctAnswer != question.userAnswer) {
             topicErrors[question.kn].errors++;
           }
+          topicErrors[question.kn].total++;
         });
       });
 
+      console.log("错误", topicErrors);
       this.topicLabels = Object.keys(topicErrors);
       this.topicErrorData = this.topicLabels.map(kn => {
         return (topicErrors[kn].errors / topicErrors[kn].total) * 100;
