@@ -15,7 +15,7 @@
       <ul>
         <li @click="goToCompletedExercises">已做习题</li>
         <li @click="goToWrongQuestions">错题合集</li>
-        <li @click="goToGradeRecord">成绩记录</li> <!-- 新增的成绩记录菜单项 -->
+        <li @click="goToGradeRecord">成绩统计</li>
         <li @click="logout">退出登录</li>
         <li @click="toggleSidebar"> >>>>>> </li>
       </ul>
