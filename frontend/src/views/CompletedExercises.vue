@@ -174,7 +174,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  height: calc(95% - 50px);
+  height: 90%;
   overflow-y: auto;
   scrollbar-width: none;
   padding-top: 20px;
