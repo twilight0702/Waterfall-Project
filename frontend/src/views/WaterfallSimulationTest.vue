@@ -187,8 +187,8 @@ export default {
       let testData = {
         results: [],
         score: 0,
-        username: this.username,
-        testId: timestampInSeconds,
+        username: this.username.toString(),
+        testId: timestampInSeconds.toString(),
       }
       console.log("username:", this.username);
       // 遍历所有题目，检查答案
@@ -197,7 +197,7 @@ export default {
           id: item.properties.id,
           userAnswer: item.userAnswer || "none",
           answer: item.properties.answer,
-          isCorrect: item.userAnswer === item.properties.answer,
+          isCorrect: (item.userAnswer === item.properties.answer).toString(),
         };
         if (item.userAnswer === item.properties.answer) {
           totalScore += 10; // 每道题10分
@@ -211,11 +211,15 @@ export default {
         }
         testData.results.push(singleData);
       });
-      testData.score = totalScore;
+      testData.score = totalScore.toString();
       let testData_json = JSON.stringify(testData);
       console.log("提交的测试数据：", testData_json);
 
-      axios.post("/knowledge/submit-test", testData_json)
+      axios.post("/knowledge/submit-test", testData_json, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
         .then((response) => {
           if (response.data === "success") {
             console.log("提交成功");
