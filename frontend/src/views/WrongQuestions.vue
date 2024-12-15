@@ -10,18 +10,21 @@
             <p>{{ question.index }}</p>
           </div>
         </div>
-        <button v-if="!redoMode && selectedMistakes.length > 0" @click="enterRedoMode" class="redo-btn">
+        <button v-if="!redoMode" @click="enterRedoMode" class="redo-btn">
           重做
         </button>
         <button v-if="redoMode" @click="submitQuiz" class="redo-btn">
           提交
         </button>
-        <h2 v-if="score != null">分数：{{ score }}</h2>
+        <button v-if="redoMode" @click="flash" class="redo-btn">
+          返回
+        </button>
       </div>
 
 
       <div class="question-records">
         <div class="question-list">
+          <h2 v-if="score != null" class="question-card">分数：{{ score }}</h2>
           <div class="question-card" v-if="selectedExam.questions.length > 0 && !redoMode"
             v-for="(question, index) in selectedExam.questions" :key="index" @click="addToRedo(question, index)">
             <p>题目{{ index + 1 }}：{{ question.text }}</p>
@@ -37,7 +40,11 @@
           <div class="question-card" v-if="selectedMistakes.length > 0 && redoMode"
             v-for="question in selectedMistakes">
             <p>题目{{ question.index }}：{{ question.text }}</p>
-            <p>知识点：{{ question.kn }}</p>
+            <p style="gap: 20px; display: flex;">知识点：{{ question.kn }}
+              <span v-if="afterSubmit" class="answer">正确答案：{{ question.correctAnswer }}</span>
+              <span v-if="afterSubmit" class="answer">你的答案：{{ question.userNewAnswer }}</span>
+            </p>
+
             <div class="choseAnser">
               <span v-if="question.A">
                 <input type="radio" :name="'question-' + question.index" :value="'A'" v-model="question.userNewAnswer">
@@ -69,6 +76,7 @@
 <script>
 import axios from 'axios';
 import eventBus from '@/eventBus';
+import { createApp } from 'vue';
 
 export default {
   name: 'CompletedExercises',
@@ -83,6 +91,7 @@ export default {
       redoMode: false,
       questionsForSubmit: [],
       score: null,
+      afterSubmit: false,
     };
   },
   created() {
@@ -173,6 +182,10 @@ export default {
     },
     enterRedoMode() {
       // 进入重做模式，更新界面为做题状态
+      if (this.selectedMistakes.length == 0) {
+        alert("请先选择题目");
+        return;
+      }
       this.redoMode = true;
     },
     submitQuiz() {
@@ -202,7 +215,7 @@ export default {
       testData.score = totalScore.toString();
       let testData_json = JSON.stringify(testData);
       console.log("提交的测试数据：", testData_json);
-
+      this.afterSubmit = true;
       axios.post("/knowledge/submit-test", testData_json, {
         headers: {
           'Content-Type': 'application/json'
@@ -220,7 +233,9 @@ export default {
 
       this.score = totalScore; // 更新成绩
     },
-
+    flash() {
+      window.location.reload();
+    }
 
   },
 };
@@ -314,6 +329,7 @@ export default {
   padding: 15px;
   cursor: pointer;
   width: 95%;
+  font-size: 18px;
 }
 
 .choseAnser {
@@ -325,6 +341,7 @@ export default {
   border-radius: 10px;
   background-color: #f8f8f8;
   margin: 5px;
+  font-size: 15px;
 }
 
 input {
@@ -346,5 +363,9 @@ input:checked::before {
   transform: translate(-50%, -50%);
   font-size: 14px;
   color: green;
+}
+
+.answer {
+  font-weight: bold;
 }
 </style>
