@@ -2,6 +2,7 @@ package com.example.Test.service;
 
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
+import org.neo4j.driver.types.MapAccessor;
 import org.neo4j.driver.types.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -105,7 +106,7 @@ public class KnowledgeService {
             Result result = session.run(query, params);
 
             if (result.hasNext()) {
-                return result.next().get("nodes").asList(value -> value.asMap());
+                return result.next().get("nodes").asList(MapAccessor::asMap);
             } else {
                 return new ArrayList<>(); // 如果没有数据返回空列表
             }
@@ -129,7 +130,7 @@ public class KnowledgeService {
             Result result = session.run(query, params);
 
             if (result.hasNext()) {
-                return result.next().get("nodes").asList(value -> value.asMap());
+                return result.next().get("nodes").asList(MapAccessor::asMap);
             } else {
                 return new ArrayList<>(); // 如果没有数据返回空列表
             }
@@ -145,7 +146,7 @@ public class KnowledgeService {
             Map<String, Object> params = new HashMap<>();
             params.put("name", name);
 
-            Result result = session.run(query, params);
+            session.run(query, params);
 
             return true;
         } catch (Exception e) {
@@ -309,7 +310,7 @@ public class KnowledgeService {
             session.run(createUserExamQuery, Map.of("userName", userName, "userExamID", userExamID));
 
             //创建当此考试的测试节点并与UserExam节点相连
-            String query = "CREATE (n:ExamTest{id:$tempTestID,answer:$answer,userAnswer:$userAnswer,isCorrect:$isCorrect}) RETURN ID(n)";
+            String query = "CREATE (n:ExamTest{id:$tempTestID,answer:$answer,userAnswer:$userAnswer,isCorrect:$isCorrect,kn:$kn}) RETURN ID(n)";
             String query2 = "MATCH (n:UserExam),(m:ExamTest) WHERE ID(n)=$userExamID AND ID(m)=$examTestID CREATE (n)-[:HAS_TEST]->(m)";
             for (Map<String, Object> test : tests) {
                 String tempTestID = (String) test.get("id");
@@ -317,7 +318,12 @@ public class KnowledgeService {
                 String userAnswer = (String) test.get("userAnswer");
                 String isCorrect = (String) test.get("isCorrect");
 
-                result = session.run(query, Map.of("tempTestID", tempTestID, "answer", answer, "userAnswer", userAnswer, "isCorrect", isCorrect));
+                //查询这道题目的所属知识点
+                String findKN="MATCH (n:test{id:$tempTestID}) RETURN n.kn";
+                Result findKNr_Result=session.run(findKN,Map.of("tempTestID",tempTestID));
+                String kn=findKNr_Result.single().get("n.kn").asString();
+
+                result = session.run(query, Map.of("tempTestID", tempTestID, "answer", answer, "userAnswer", userAnswer, "isCorrect", isCorrect,"kn",kn));
                 long examTestID = result.single().get("ID(n)").asLong();
                 session.run(query2, Map.of("userExamID", userExamID, "examTestID", examTestID));
             }
