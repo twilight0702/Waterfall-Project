@@ -5,12 +5,7 @@
 
     <!-- 搜索框 -->
     <div class="search-box">
-      <input 
-        v-model="searchQuery" 
-        type="text" 
-        placeholder="搜索章节..."
-        class="search-input"
-      />
+      <input v-model="searchQuery" type="text" placeholder="搜索章节..." class="search-input" />
       <!-- 搜索按钮 -->
       <button @click="searchChapter" class="search-button">搜索</button>
     </div>
@@ -23,7 +18,7 @@
         <p class="formatted-text" id="my-text">{{ chapterContent.text }}</p>
         <!-- 显示对应图片 -->
         <div v-if="chapterImage" class="chapter-image">
-        <img :src="chapterImage" alt="章节图片" @error="onImageError" />
+          <img :src="chapterImage" alt="章节图片" @error="onImageError" />
         </div>
       </div>
 
@@ -36,8 +31,6 @@
 </template>
 
 <style scoped>
-
-
 .content {
   position: fixed;
   top: 100px;
@@ -47,29 +40,45 @@
 }
 
 .chapter-content {
-  width: 100%; /* 根据容器自动适配宽度 */
-  max-height: 80vh; /* 限制最大高度，防止溢出 */
-  margin: 0 auto; /* 居中容器 */
+  width: 100%;
+  /* 根据容器自动适配宽度 */
+  max-height: 80vh;
+  /* 限制最大高度，防止溢出 */
+  margin: 0 auto;
+  /* 居中容器 */
   padding: 20px;
-  overflow-y: auto; /* 启用垂直滚动 */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加阴影以区分内容块 */
-  background-color: #fff; /* 白色背景 */
-  border-radius: 8px; /* 添加圆角 */
-  border: 1px solid #ddd; /* 边框 */
+  overflow-y: auto;
+  /* 启用垂直滚动 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* 添加阴影以区分内容块 */
+  background-color: #fff;
+  /* 白色背景 */
+  border-radius: 8px;
+  /* 添加圆角 */
+  border: 1px solid #ddd;
+  /* 边框 */
 }
 
 .chapter-content h2 {
-  font-size: 32px; /* 设置标题字号 */
-  text-align: center; /* 标题居中 */
-  margin-bottom: 20px; /* 增加下方间距 */
-  color: #333; /* 标题文字颜色 */
+  font-size: 32px;
+  /* 设置标题字号 */
+  text-align: center;
+  /* 标题居中 */
+  margin-bottom: 20px;
+  /* 增加下方间距 */
+  color: #333;
+  /* 标题文字颜色 */
 }
 
 .chapter-content .formatted-text {
-  font-size: 20px; /* 设置文本字号 */
-  line-height: 1.6; /* 行高增强可读性 */
-  color: #555; /* 文本颜色 */
-  white-space: pre-wrap; /* 保留换行和空格格式 */
+  font-size: 20px;
+  /* 设置文本字号 */
+  line-height: 1.6;
+  /* 行高增强可读性 */
+  color: #555;
+  /* 文本颜色 */
+  white-space: pre-wrap;
+  /* 保留换行和空格格式 */
 }
 
 /* 搜索框样式 */
@@ -114,17 +123,21 @@
 
 .chapter-image {
   display: flex;
-  justify-content: flex-start; 
-  align-items: center; /* 垂直居中对齐 */
-  height: 100%; /* 确保容器有高度 */
+  justify-content: flex-start;
+  align-items: center;
+  /* 垂直居中对齐 */
+  height: 100%;
+  /* 确保容器有高度 */
 }
 
 .chapter-image img {
-  max-width: 100%; /* 让图片宽度适应屏幕 */
-  max-height: 70vh; /* 限制图片的最大高度 */
-  object-fit: contain; /* 保持图片比例 */
+  max-width: 100%;
+  /* 让图片宽度适应屏幕 */
+  max-height: 70vh;
+  /* 限制图片的最大高度 */
+  object-fit: contain;
+  /* 保持图片比例 */
 }
-
 </style>
 
 <script>
@@ -216,9 +229,10 @@ export default {
     onImageError() {
       console.error('图片加载失败:', this.chapterImage);
       this.errorMessage = '图片加载失败，请检查图片路径。';
-    }
+    },
   },
   created() {
+    this.$getUser();
     // 初始加载时获取默认章节的内容和图片
     this.fetchChapterContent(this.selectedChapter);
     this.setChapterImage(this.selectedChapter);

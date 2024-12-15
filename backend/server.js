@@ -35,7 +35,7 @@ app.post('/login', async (req, res) => {
       // 如果密码正确，返回成功响应
       //const userDataPath = path.join(usersDataDir, `${username}.json`);
       //const userData = jsonfile.readFileSync(userDataPath);
-      return res.status(200).json({ message: '登录成功'});
+      return res.status(200).json({ message: '登录成功' });
     } else {
       return res.status(401).send('用户名或密码错误');
     }

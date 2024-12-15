@@ -12,11 +12,12 @@
 
     <!-- 侧边栏 -->
     <div :class="['sidebar', { show: sidebarVisible }]">
-      <div class="close-btn" @click="toggleSidebar">×</div> <!-- 关闭按钮 -->
       <ul>
         <li @click="goToCompletedExercises">已做习题</li>
-        <li @click="goToWrongQuestions">错题集</li>
-        <li @click="goToGradeRecord">成绩记录</li> <!-- 新增的成绩记录菜单项 -->
+        <li @click="goToWrongQuestions">错题合集</li>
+        <li @click="goToGradeRecord">成绩统计</li>
+        <li @click="logout">退出登录</li>
+        <li @click="toggleSidebar"> >>>>>> </li>
       </ul>
     </div>
   </nav>
@@ -24,6 +25,7 @@
 
 <script>
 import eventBus from '@/eventBus'
+import axios from 'axios'
 
 export default {
   name: 'NavBar',
@@ -40,14 +42,20 @@ export default {
       if (newUsername) this.username = newUsername;
       this.navbarHidden = 0;
     });
+    eventBus.on('hideNavbar', (hide) => {
+      sidebarVisible = false;
+      this.navbarHidden = hide;
+    });
+    eventBus.on('')
   },
   beforeDestroy() {
+    eventBus.emit('hideNavbar', 1);
+    eventBus.off('hideNavbar');
     eventBus.off('usernameUpdated');
   },
   methods: {
     // 控制侧边栏的显示与隐藏
     toggleSidebar() {
-      console.log('点击了用户名');  // 用于调试，检查点击事件是否触发
       this.sidebarVisible = !this.sidebarVisible;  // 切换侧边栏的显示状态
     },
     // 跳转到已做习题页面
@@ -61,6 +69,12 @@ export default {
     // 跳转到成绩记录页面
     goToGradeRecord() {
       this.$router.push('/grade-record');
+    },
+    logout() {
+      const hash = this.$getHash();
+      console.log(hash);
+      axios.get(`/knowledge/removeUser?key=${hash}`);
+      window.location.href = window.location.origin + '/login'; // 重新加载到新路径
     }
   }
 };
@@ -72,7 +86,7 @@ nav {
   position: fixed;
   top: 0;
   left: 0;
-  height: 50px;
+  height: 45px;
   background-color: #fff;
   padding: 0 20px;
   width: 100%;
@@ -139,38 +153,39 @@ a:hover {
 /* 侧边栏样式 */
 .sidebar {
   position: fixed;
-  top: 60px; /* 保持与导航栏的距离 */
-  right: 0;
-  background: #ffffff;
+  top: 20%;
+  bottom: 20%;
+  /* 保持与导航栏的距离 */
+  right: -60px;
   width: 240px;
-  height: 100vh;
-  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1); /* 更柔和的阴影 */
   padding: 20px;
-  z-index: 9999;
+  z-index: 50;
   transition: transform 0.3s ease-in-out;
-  transform: translateX(100%); /* 初始状态右侧隐藏 */
-  border-radius: 10px 0 0 10px; /* 圆角效果 */
+  transform: translateX(100%);
+  /* 初始状态右侧隐藏 */
+  border-radius: 40px 0 0 40px;
+  /* 圆角效果 */
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  background: rgba(71, 159, 140, 0.479);
+  backdrop-filter: blur(10px);
+}
+
+.sidebar::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  filter: blur(1px);
+  z-index: -1;
 }
 
 .sidebar.show {
-  transform: translateX(0); /* 侧边栏弹出 */
-}
-
-.sidebar .close-btn {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  font-size: 24px;
-  cursor: pointer;
-  color: #00796b;
-  transition: color 0.3s ease;
-}
-
-.sidebar .close-btn:hover {
-  color: #d32f2f;
+  transform: translateX(0);
+  /* 侧边栏弹出 */
 }
 
 /* 侧边栏菜单项 */
@@ -183,13 +198,14 @@ a:hover {
 
 .sidebar li {
   cursor: pointer;
-  font-size: 17px;
-  font-weight: normal;
-  margin-top: 15px;
-  padding: 12px 20px;
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 20px;
+  padding: 10px;
   transition: background-color 0.3s ease, color 0.3s ease;
-  border-radius: 8px;
-  color: #555;
+  border-radius: 10px;
+  color: #396d64;
+  text-align: center;
 }
 
 .sidebar li:hover {

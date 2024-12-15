@@ -19,7 +19,9 @@ export default defineConfig({
     proxy: {
       // 将 '/knowledge' 路径代理到后端服务 http://localhost:8080
       '/knowledge': {
-        target: 'http://localhost:8080', // 后端服务地址
+        // target: 'http://localhost:8080', // 后端服务地址
+        target: 'http://192.168.137.1:8080', // 后端服务地址
+
         changeOrigin: true, // 允许跨域
         rewrite: (path) => path.replace(/^\/knowledge/, '/knowledge'), // 重写路径
       },
