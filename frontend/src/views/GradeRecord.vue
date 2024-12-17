@@ -1,6 +1,9 @@
 <template>
   <div class="score-statistics">
     <h1>成绩统计</h1>
+    <div class="divided">
+
+    </div>
     <div class="charts">
       <!-- 时间维度的正确率变化图表 -->
       <div class="chart-container">
@@ -97,6 +100,7 @@ export default {
       this.examRecords.sort((a, b) => a.date.localeCompare(b.date));
       this.timeLabels = this.examRecords.map(exam => exam.date);
       this.accuracyData = this.examRecords.map(exam => exam.accuracy);
+      let totalErrors = 0; // 统计总错题数
 
       // 知识点维度的错误占比数据
       const topicErrors = {};
@@ -107,6 +111,7 @@ export default {
           }
           if (question.correctAnswer != question.userAnswer) {
             topicErrors[question.kn].errors++;
+            totalErrors++; // 错题总数增加
           }
           topicErrors[question.kn].total++;
         });
@@ -115,7 +120,7 @@ export default {
       console.log("错误", topicErrors);
       this.topicLabels = Object.keys(topicErrors);
       this.topicErrorData = this.topicLabels.map(kn => {
-        return (topicErrors[kn].errors / topicErrors[kn].total) * 100;
+        return (topicErrors[kn].errors / totalErrors) * 100;
       });
 
       // 渲染图表
@@ -164,7 +169,7 @@ export default {
           datasets: [{
             label: '知识点错误占比',
             data: this.topicErrorData,
-            backgroundColor: ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FF8C33'],
+            backgroundColor: ['#a90e20', '#edd49c', '#fa9500', '#79d5be', '#016273','#019796'],
             borderColor: '#ffffff',
             borderWidth: 1,
           }],
@@ -198,13 +203,21 @@ export default {
   align-items: center;
 }
 
-h1 {
+.score-statistics h1 {
   font-size: 36px;
   margin-bottom: 20px;
+  background-color:#86b1ab ;
+  min-width: 300px;
+  border-radius: 15px; /* 添加圆角 */
+  text-align: center; /* 文本内容居中 */
+  margin: 0 auto; /* 块级元素水平居中 */
+  color:#ffffff;
+  font-weight: bold;
 }
 
 h2 {
   text-align: center;
+  color:#495b5b;
 }
 
 .charts {
@@ -212,6 +225,7 @@ h2 {
   flex-direction: row;
   gap: 40px;
   width: 90%;
+  min-height: 500px;
 }
 
 .chart-container {
@@ -222,5 +236,9 @@ h2 {
 canvas {
   width: 100%;
   height: 500px;
+}
+
+.divided{
+  height:50px;
 }
 </style>

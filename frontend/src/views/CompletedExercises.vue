@@ -130,6 +130,7 @@ export default {
 
 <style scoped>
 .completed-exercises {
+  margin-top: 30px;
   padding: 20px;
 }
 
@@ -168,8 +169,8 @@ export default {
 }
 
 .exam-list,
-.question-list {
-  background-color: rgb(143, 198, 143);
+.question-records .question-list {
+  background-color: #9cc2bc;
   border-radius: 20px;
   display: flex;
   flex-direction: column;
@@ -178,6 +179,7 @@ export default {
   overflow-y: auto;
   scrollbar-width: none;
   padding-top: 20px;
+  border: 10px solid #9cc2bc; 
 
 }
 
@@ -187,7 +189,7 @@ export default {
 }
 
 .exam-card,
-.question-card {
+.question-records .question-list .question-card {
   background-color: #f8f8f8;
   border: 1px solid #ddd;
   border-radius: 16px;
@@ -195,9 +197,6 @@ export default {
   align-self: center;
   padding: 15px;
   cursor: pointer;
-}
-
-.question-card {
   width: 95%;
 }
 
@@ -205,4 +204,18 @@ export default {
   transition: transform 0.2s ease-in-out;
   transform: scale(1.05);
 }
+
+h1 {
+  background-color:#86b1ab ;
+  max-width: 300px;
+  border-radius: 15px; /* 添加圆角 */
+  text-align: center; /* 文本内容居中 */
+  margin: 0 auto; /* 块级元素水平居中 */
+  color:#ffffff;
+}
+
+h2 {
+  color:#495b5b;
+}
+
 </style>

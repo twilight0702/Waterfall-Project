@@ -102,7 +102,7 @@
 }
 
 .search-input:focus {
-  border-color: #007bff;
+  border-color: #396d64;
 }
 
 .search-button {
@@ -115,7 +115,7 @@
 }
 
 .search-button:hover {
-  background-color: #007bff;
+  background-color: #508a80;
   color: white;
 }
 

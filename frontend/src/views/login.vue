@@ -228,7 +228,7 @@ button {
   padding: 12px 15px;
   font-size: 18px;
   color: white;
-  background-color: #4caf50;
+  background-color: #019785;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -237,15 +237,15 @@ button {
 
 button:hover {
   transform: scale(1.05);
-  background-color: #45a049;
+  background-color: rgb(22, 97, 79);
 }
 
 /* 注册按钮样式 */
 .register-button {
-  background-color: #007bff;
+  background-color: #0087a4;
 }
 
 .register-button:hover {
-  background-color: #0056b3;
+  background-color: rgb(32, 91, 121);
 }
 </style>

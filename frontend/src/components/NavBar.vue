@@ -123,7 +123,7 @@ a {
 }
 
 a:hover {
-  background-color: #e0f7fa;
+  background-color: #bfe1df;
   color: #00796b;
 }
 
@@ -147,7 +147,8 @@ a:hover {
 }
 
 .user-info:hover {
-  background-color: #e0f7fa;
+  background-color: #bfe1df;
+  color: #00796b;
 }
 
 /* 侧边栏样式 */
@@ -168,8 +169,8 @@ a:hover {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  background: rgba(71, 159, 140, 0.479);
-  backdrop-filter: blur(10px);
+  background: rgba(112, 178, 164, 0.24);
+  backdrop-filter: blur(5px);
 }
 
 .sidebar::before {

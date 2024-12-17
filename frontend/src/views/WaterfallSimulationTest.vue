@@ -247,7 +247,7 @@ button {
   font-size: large;
   height: 50px;
   width: 350px;
-  background-color: rgb(33, 90, 136);
+  background-color: #00796b;
   color: white;
   border: none;
   cursor: pointer;
@@ -260,7 +260,7 @@ button {
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #2e9a8d;
 }
 
 ul {
@@ -319,7 +319,7 @@ input[type="radio"] {
   font-size: large;
   width: 140px;
   height: 70px;
-  background-color: #38c4b3;
+  background-color: #7fc5b7;
   box-shadow: 4px 4px 10px rgba(54, 124, 118, 0.2);
   border-radius: 10px;
   cursor: pointer;
@@ -328,13 +328,13 @@ input[type="radio"] {
 }
 
 .option-button.selected {
-  background-color: #1f9dce;
+  background-color: #419c8e;
   /* 选中时的背景色 */
   color: white;
 }
 
 .option-button:hover {
-  background-color: #1f9dce;
+  background-color: #419c8e;
 }
 
 .tests-container {

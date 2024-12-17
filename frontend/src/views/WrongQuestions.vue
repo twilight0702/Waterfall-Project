@@ -70,7 +70,7 @@
       </div>
 
     </div>
-  </div>
+    </div>
 </template>
 
 <script>
@@ -251,6 +251,7 @@ export default {
   font-weight: bold;
   font-size: 36px;
   margin-bottom: 20px;
+  margin-top: 30px;
 }
 
 .main-content {
@@ -267,7 +268,7 @@ export default {
 }
 
 .incorrect-list {
-  background-color: rgb(95, 210, 179);
+  background-color: #699c95;
   border-radius: 20px;
   display: flex;
   flex-direction: row;
@@ -292,7 +293,7 @@ export default {
 .redo-btn {
   font-size: 20px;
   padding: 10px 20px;
-  background-color: #4CAF50;
+  background-color: #84b1ab;
   color: white;
   border: none;
   border-radius: 10px;
@@ -300,7 +301,7 @@ export default {
 }
 
 .redo-btn:hover {
-  background-color: #45a049;
+  background-color: #4f7772;
 }
 
 .question-records {
@@ -308,7 +309,7 @@ export default {
 }
 
 .question-list {
-  background-color: rgb(143, 198, 143);
+  background-color: #9cc2bc;
   border-radius: 20px;
   display: flex;
   flex-direction: column;
@@ -317,7 +318,7 @@ export default {
   overflow-y: auto;
   scrollbar-width: none;
   padding-top: 20px;
-
+  border:5px solid #9cc2bc;
 }
 
 .question-card {
@@ -367,5 +368,14 @@ input:checked::before {
 
 .answer {
   font-weight: bold;
+}
+
+h1 {
+  background-color:#86b1ab ;
+  max-width: 300px;
+  border-radius: 15px; /* 添加圆角 */
+  text-align: center; /* 文本内容居中 */
+  margin: 0 auto; /* 块级元素水平居中 */
+  color:#ffffff;
 }
 </style>
